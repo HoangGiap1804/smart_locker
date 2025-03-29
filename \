@@ -1,0 +1,75 @@
+import 'package:camera/camera.dart';
+import 'package:flutter/material.dart';
+
+class CameraScreen extends StatefulWidget {
+  final List<CameraDescription> cameras;
+  const CameraScreen({
+    super.key,
+    required this.cameras
+  });
+
+  @override
+  State<CameraScreen> createState() => _CameraScreenState();
+}
+
+class _CameraScreenState extends State<CameraScreen> {
+
+  late CameraController _controller;
+
+  @override
+  void initState() {
+    initCamera();
+    super.initState();
+  }
+
+  initCamera(){
+    final frontCamera = widget.cameras.firstWhere(
+    (camera) => camera.lensDirection == CameraLensDirection.front,
+    orElse: () => widget.cameras.first, // Nếu không có camera trước, dùng camera đầu tiên
+  );
+    _controller = CameraController(frontCamera, ResolutionPreset.max);
+    _controller.initialize().then((_){
+      if(!mounted){
+        return;
+      }
+      setState(() {
+      });
+    });
+  } 
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if(!_controller.value.isInitialized){
+      return Scaffold();
+    } else{
+    return Scaffold(
+      body: Center(
+        child: Stack(
+          children: [
+        Transform.flip(
+        flipX: true,
+        child: Transform.scale(
+          scale: 3, // Điều chỉnh tỷ lệ nếu cần
+          child: Transform.rotate(
+            angle: -3.14159 / 2, // Xoay 90 độ
+            child: AspectRatio(
+              aspectRatio: _controller.value.aspectRatio,
+              child: CameraPreview(_controller),
+            ),
+          ),
+        ),
+        ),
+        Image.asset('assets/images/face_error.png', scale: 0.4,)
+          ],
+        )
+      ),
+    );
+    }
+  }
+}
