@@ -1,8 +1,7 @@
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_locker/core/app/app_router.dart';
 import 'package:firebase_core/firebase_core.dart';
-
+import 'package:smart_locker/module/home_page/screens/home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,10 +15,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appRouter = AppRouter();
-    return MaterialApp.router(
+    // return MaterialApp.router(
+    //   debugShowCheckedModeBanner: false,
+    //   routerConfig: appRouter.config(),
+    // );
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      routerConfig: appRouter.config(),
+      home: HomeScreen(),
     );
   }
 }
-
