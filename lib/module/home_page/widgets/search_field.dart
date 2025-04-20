@@ -2,7 +2,11 @@ import 'package:smart_locker/models/shared/app_theme.dart';
 import 'package:flutter/material.dart';
 
 class SearchField extends StatelessWidget {
-  const SearchField({super.key});
+  final TextEditingController controller;
+  const SearchField({
+    super.key,
+    required this.controller
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +23,7 @@ class SearchField extends StatelessWidget {
       child: Padding( 
         padding: const EdgeInsets.all(5),
         child: TextField(
+          controller: controller,
           decoration: InputDecoration(
             filled: true,
             fillColor: Colors.white,

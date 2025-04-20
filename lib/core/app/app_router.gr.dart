@@ -52,7 +52,10 @@ abstract class _$AppRouter extends RootStackRouter {
 /// [CreateAccountScreen]
 class CreateAccountRoute extends PageRouteInfo<void> {
   const CreateAccountRoute({List<PageRouteInfo>? children})
-    : super(CreateAccountRoute.name, initialChildren: children);
+      : super(
+          CreateAccountRoute.name,
+          initialChildren: children,
+        );
 
   static const String name = 'CreateAccountRoute';
 
@@ -63,7 +66,10 @@ class CreateAccountRoute extends PageRouteInfo<void> {
 /// [ForgotPasswordScreen]
 class ForgotPasswordRoute extends PageRouteInfo<void> {
   const ForgotPasswordRoute({List<PageRouteInfo>? children})
-    : super(ForgotPasswordRoute.name, initialChildren: children);
+      : super(
+          ForgotPasswordRoute.name,
+          initialChildren: children,
+        );
 
   static const String name = 'ForgotPasswordRoute';
 
@@ -74,7 +80,10 @@ class ForgotPasswordRoute extends PageRouteInfo<void> {
 /// [HomeScreen]
 class HomeRoute extends PageRouteInfo<void> {
   const HomeRoute({List<PageRouteInfo>? children})
-    : super(HomeRoute.name, initialChildren: children);
+      : super(
+          HomeRoute.name,
+          initialChildren: children,
+        );
 
   static const String name = 'HomeRoute';
 
@@ -85,7 +94,10 @@ class HomeRoute extends PageRouteInfo<void> {
 /// [LoginScreen]
 class LoginRoute extends PageRouteInfo<void> {
   const LoginRoute({List<PageRouteInfo>? children})
-    : super(LoginRoute.name, initialChildren: children);
+      : super(
+          LoginRoute.name,
+          initialChildren: children,
+        );
 
   static const String name = 'LoginRoute';
 
@@ -96,7 +108,10 @@ class LoginRoute extends PageRouteInfo<void> {
 /// [ProfileScreen]
 class ProfileRoute extends PageRouteInfo<void> {
   const ProfileRoute({List<PageRouteInfo>? children})
-    : super(ProfileRoute.name, initialChildren: children);
+      : super(
+          ProfileRoute.name,
+          initialChildren: children,
+        );
 
   static const String name = 'ProfileRoute';
 

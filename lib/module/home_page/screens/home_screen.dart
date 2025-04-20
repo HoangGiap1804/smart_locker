@@ -20,7 +20,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return homeAdmin();
+    return homeUser(context);
   }
 
   Widget homeAdmin() {
@@ -57,15 +57,15 @@ class HomeScreen extends StatelessWidget {
         body: BlocBuilder<HomeBloc, HomeState>(
           builder: (context, state) {
             if (state is HomeChangePage) {
-                return IndexedStack(
-                  index: state.index,
-                  children: [
-                    UserManagementPage(),
-                    LockerManagementPage(),
-                    // VideoHistoryPage(),
-                  ],
-                );
-              }
+              return IndexedStack(
+                index: state.index,
+                children: [
+                  UserManagementPage(),
+                  LockerManagementPage(),
+                  // VideoHistoryPage(),
+                ],
+              );
+            }
             return UserManagementPage();
           },
         ),
@@ -92,7 +92,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget homeUser() {
+  Widget homeUser(BuildContext context) {
     return BlocProvider(
       create: (context) => HomeBloc(),
       child: Scaffold(
@@ -112,7 +112,7 @@ class HomeScreen extends StatelessWidget {
           actions: [
             GestureDetector(
               onTap: () {
-                // context.router.push(ProfileRoute());
+                context.router.push(ProfileRoute());
               },
               child: Container(
                 margin: EdgeInsets.all(10),
@@ -126,11 +126,11 @@ class HomeScreen extends StatelessWidget {
         body: BlocBuilder<HomeBloc, HomeState>(
           builder: (context, state) {
             if (state is HomeChangePage) {
-                return IndexedStack(
-                  index: state.index,
-                  children: [HomePage(), SearchPackagePage(), CameraScreen()],
-                );
-              }
+              return IndexedStack(
+                index: state.index,
+                children: [HomePage(), SearchPackagePage(), SearchPackagePage(),],
+              );
+            }
             return HomePage();
           },
         ),

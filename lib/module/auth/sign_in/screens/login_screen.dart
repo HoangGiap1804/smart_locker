@@ -7,8 +7,6 @@ import 'package:smart_locker/models/shared/app_theme.dart';
 import 'package:smart_locker/module/auth/bloc/auth_bloc.dart';
 import 'package:smart_locker/module/auth/bloc/auth_event.dart';
 import 'package:smart_locker/module/auth/bloc/auth_state.dart';
-import 'package:smart_locker/module/auth/sign_in/screens/create_account_screen.dart';
-import 'package:smart_locker/module/auth/sign_in/screens/forgot_password_screen.dart';
 import 'package:smart_locker/module/auth/sign_in/widgets/button.dart';
 import 'package:smart_locker/module/auth/sign_in/widgets/button_circle_image.dart';
 import 'package:smart_locker/module/auth/sign_in/widgets/forgot_password.dart';
@@ -137,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
           hintText: "Username or Email",
           icon: Icons.person,
           onChanged: (value) {
-            context.read<AuthBloc>().add(UsernameChanged(username: value));
+            // context.read<AuthBloc>().add(UsernameChanged(username: value));
           },
         ),
         Padding(
@@ -147,7 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
             hintText: "Password",
             icon: Icons.lock,
             onChanged: (value) {
-              context.read<AuthBloc>().add(PasswordChanged(password: value));
+              // context.read<AuthBloc>().add(PasswordChanged(password: value));
             },
           ),
         ),

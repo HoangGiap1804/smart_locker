@@ -99,7 +99,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
           hintText: "Username",
           icon: Icons.person,
           onChanged: (value) {
-            context.read<AuthBloc>().add(UsernameChanged(username: value));
+            // context.read<AuthBloc>().add(UsernameChanged(username: value));
           },
         ),
         Padding(
@@ -109,7 +109,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
             hintText: "Email",
             icon: Icons.email,
             onChanged: (value) {
-              context.read<AuthBloc>().add(UsernameChanged(username: value));
+              // context.read<AuthBloc>().add(UsernameChanged(username: value));
             },
           ),
         ),
@@ -120,7 +120,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
             hintText: "Full name ",
             icon: Icons.person,
             onChanged: (value) {
-              context.read<AuthBloc>().add(UsernameChanged(username: value));
+              // context.read<AuthBloc>().add(UsernameChanged(username: value));
             },
           ),
         ),
@@ -131,7 +131,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
             hintText: "Phone number",
             icon: Icons.phone,
             onChanged: (value) {
-              context.read<AuthBloc>().add(UsernameChanged(username: value));
+              // context.read<AuthBloc>().add(UsernameChanged(username: value));
             },
           ),
         ),
@@ -156,7 +156,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
             hintText: "Password",
             icon: Icons.lock,
             onChanged: (value) {
-              context.read<AuthBloc>().add(PasswordChanged(password: value));
+              // context.read<AuthBloc>().add(PasswordChanged(password: value));
             },
           ),
         ),
@@ -167,7 +167,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
             hintText: "ConfirmPassword",
             icon: Icons.lock,
             onChanged: (value) {
-              context.read<AuthBloc>().add(PasswordChanged(password: value));
+              // context.read<AuthBloc>().add(PasswordChanged(password: value));
             },
           ),
         ),
@@ -179,39 +179,39 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     return Column(
       children: [
         BlocConsumer<AuthBloc, AuthState>(
-        listener: (context, state) {
-        (state is AuthError)
-          ? ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.error),
-              backgroundColor: Colors.red,
-            ),
-          )
-          : null;
-        (state is SignUpSucces) ? Navigator.pop(context) : null;
-        },
-        builder: (context, state) {
-          return state is AuthLoading
-            ? CircularProgressIndicator()
-            : Button(
-              text: "Create Account",
-              onTab: () {
-                FocusScope.of(context).unfocus();
-                context.read<AuthBloc>().add(
-                  SignUpSubmitted(
-                    userName: _userName.text,
-                    fullName: _fullName.text,
-                    email: _email.text,
-                    phoneNumber: _phoneNumber.text,
-                    gender: _selectGender ?? "Female",
-                    password: _password.text,
-                    confirmPassword: _confirmPassword.text
-                  )
+          listener: (context, state) {
+            (state is AuthError)
+                ? ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.error),
+                    backgroundColor: Colors.red,
+                  ),
+                )
+                : null;
+            (state is SignUpSucces) ? Navigator.pop(context) : null;
+          },
+          builder: (context, state) {
+            return state is AuthLoading
+                ? CircularProgressIndicator()
+                : Button(
+                  text: "Create Account",
+                  onTab: () {
+                    FocusScope.of(context).unfocus();
+                    context.read<AuthBloc>().add(
+                      SignUpSubmitted(
+                        userName: _userName.text,
+                        fullName: _fullName.text,
+                        email: _email.text,
+                        phoneNumber: _phoneNumber.text,
+                        gender: _selectGender ?? "Female",
+                        password: _password.text,
+                        confirmPassword: _confirmPassword.text,
+                      ),
+                    );
+                  },
                 );
-              },
-            );
-        },
-      ),
+          },
+        ),
       ],
     );
   }

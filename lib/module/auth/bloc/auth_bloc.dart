@@ -1,87 +1,79 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:smart_locker/models/user.dart';
 import 'package:smart_locker/module/auth/bloc/auth_event.dart';
 import 'package:smart_locker/module/auth/bloc/auth_state.dart';
 import 'package:smart_locker/module/auth/repository/authentication_repository.dart';
+import 'package:smart_locker/repositories/user_repository.dart';
+import 'package:smart_locker/services/api_service.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-
   final _auth = AuthenticationRepository();
 
-  AuthBloc() : super(AuthInital()){
-
+  AuthBloc() : super(AuthInital()) {
     on<UsernameChanged>((event, emit) {
       String username = event.username;
-      if(username.isEmpty){
+      if (username.isEmpty) {
         emit(UsernameError(error: "Username does not empty"));
-      }
-      else if(username.length < 3){
+      } else if (username.length < 3) {
         emit(UsernameError(error: "Username is too short"));
-      }
-      else {
+      } else {
         emit(UsernameValid());
       }
     });
 
     on<PasswordChanged>((event, emit) {
       String password = event.password;
-      if(password.isEmpty){
+      if (password.isEmpty) {
         emit(PasswordError(error: "Password does not empty"));
-      }
-      else if(password.length < 3){
+      } else if (password.length < 3) {
         emit(PasswordError(error: "Password is too short"));
-      }
-      else {
+      } else {
         emit(PasswordValid());
       }
     });
 
-    on<LoginSubmitted>((event, emit) async{
+    on<LoginSubmitted>((event, emit) async {
       emit(AuthLoading());
       try {
         String username = event.username;
         String password = event.password;
 
-        String res = await _auth.loginUser(
-          userName: username,
-          password: password,
-        );
+        User user = await UserRepository(
+          ApiService(),
+        ).signInUser(username, password);
 
-        if(res == "success"){
+        if (user != null) {
           emit(LoginSucces());
-        }
-        else{
-          emit(LoginError(error: res));
+        } else {
+          emit(LoginError(error: user.toString()));
         }
       } catch (e) {
         emit(LoginError(error: e.toString()));
       }
     });
 
-    on<SignUpSubmitted>((event, emit) async{
+    on<SignUpSubmitted>((event, emit) async {
       emit(AuthLoading());
       try {
-        String res = await AuthenticationRepository().signUpUser(
+        User signup = User(
           userName: event.userName,
           fullName: event.fullName,
           email: event.email,
           phoneNumber: event.phoneNumber,
           gender: event.gender,
           password: event.password,
-          confirmPassword: event.confirmPassword,
         );
 
-        if(res == "success"){
+        User user = await UserRepository(ApiService()).signUpUser(signup);
+        if(user != null){
           emit(SignUpSucces());
-        }
-        else{
-          emit(SignUpError(error: res));
         }
       } catch (e) {
         emit(SignUpError(error: e.toString()));
       }
     });
 
-    on<ForgotPasswordSubmitted>((event, emit) async{
+    on<ForgotPasswordSubmitted>((event, emit) async {
       emit(AuthLoading());
       try {
         String username = event.username;
@@ -90,10 +82,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           username: username,
         );
 
-        if(res == "success"){
+        if (res == "success") {
           emit(SendEmailSuccess());
-        }
-        else{
+        } else {
           emit(SendEmailFaild(error: res));
         }
       } catch (e) {
@@ -101,4 +92,4 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     });
   }
-} 
+}

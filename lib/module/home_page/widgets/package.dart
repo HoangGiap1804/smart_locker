@@ -1,30 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:smart_locker/models/shared/app_theme.dart';
 
 class Package extends StatelessWidget {
-  const Package({super.key});
+  final String idOrder;
+  final String status;
+  final DateTime timeDelevery;
+  const Package({
+    super.key,
+    required this.idOrder,
+    required this.status,
+    required this.timeDelevery,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black, width: 2),
-        borderRadius: BorderRadius.circular(10),
+    return ListTile(
+      leading: Icon(Icons.lock, size: 40,),
+      isThreeLine: true,
+      title: Text(
+        "ID: ${idOrder}",
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "ID: aopiejfoiajefoiajefoi",
-              style: AppTheme.textTheme.headlineSmall,
-            ),
-            Text("Locker: ABD 123", style: AppTheme.textTheme.headlineSmall),
-            Text("Compartment: A 14", style: AppTheme.textTheme.headlineSmall),
-          ],
-        ),
-      ),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Delevery: ${DateFormat('yyyy/MM/dd - kk:mm').format(timeDelevery)}"),
+          Text("Status: ${status}")
+        ],
+      )
     );
   }
 }
