@@ -1,3 +1,5 @@
+import 'package:camera/camera.dart';
+
 abstract class AuthEvent {}
 
 class UsernameChanged extends AuthEvent {
@@ -12,16 +14,14 @@ class PasswordChanged extends AuthEvent {
   PasswordChanged({required this.password});
 }
 
-class LoginSubmitted extends AuthEvent{
+class LoginSubmitted extends AuthEvent {
   final String username;
   final String password;
 
-  LoginSubmitted({
-    required this.username,
-    required this.password,
-  });
+  LoginSubmitted({required this.username, required this.password});
 }
-class SignUpSubmitted extends AuthEvent{
+
+class SignUpSubmitted extends AuthEvent {
   final String userName;
   final String fullName;
   final String email;
@@ -29,6 +29,7 @@ class SignUpSubmitted extends AuthEvent{
   final String gender;
   final String password;
   final String confirmPassword;
+  final XFile picture;
 
   SignUpSubmitted({
     required this.userName,
@@ -38,13 +39,14 @@ class SignUpSubmitted extends AuthEvent{
     required this.gender,
     required this.password,
     required this.confirmPassword,
+    required this.picture,
   });
 }
-class ForgotPasswordSubmitted extends AuthEvent{
+
+class ForgotPasswordSubmitted extends AuthEvent {
   final String username;
 
-  ForgotPasswordSubmitted({
-    required this.username,
-  });
+  ForgotPasswordSubmitted({required this.username});
 }
-class LogoutSubmitted extends AuthEvent{ }
+
+class LogoutSubmitted extends AuthEvent {}

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:dio/dio.dart';
 import 'package:smart_locker/services/storage_service.dart';
 
@@ -32,24 +34,27 @@ class UserRepository {
     }
   }
 
-  Future<User> signUpUser(User user) async {
-    try {
-      final response = await apiService.post('api/auth/signup/', {
-        'username': user.userName,
-        'full_name': user.fullName,
-        'email': user.email,
-        'phone_number': user.phoneNumber,
-        'gender': user.gender,
-        'password': user.password,
-      });
+  Future<bool> signUpUser(User user) async {
+    int ran = Random().nextInt(1000000);
+    final formData = FormData.fromMap({
+      'username': user.userName,
+      'full_name': user.fullName,
+      'email': user.email,
+      'phone_number': user.phoneNumber,
+      'gender': user.gender,
+      'password': user.password,
+      'face_id': await MultipartFile.fromFile(
+        user.picture!.path,
+        filename: '$ran.jpg',
+      ),
+    });
 
-      if (response.statusCode == 201) {
-        return User.fromJson(response.data);
-      } else {
-        throw Exception('Something is wrong');
-      }
-    } catch (e) {
-      throw Exception('Sign up is fail' + e.toString()); // ✅ Không return null
+    final response = await apiService.post('api/auth/signup/', formData);
+
+    if (response.statusCode == 201) {
+      return response.data['success'];
+    } else {
+      throw Exception(response.data['error']);
     }
   }
 }

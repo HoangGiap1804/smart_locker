@@ -26,11 +26,14 @@ class OrderRepository {
     }
   }
 
-  Future<List<Order>> getListOrder(String accessToken) async {
+  Future<List<Order>?> getListOrder(String accessToken) async {
     final response = await apiService.get(
       'api/orders/list-products/',
       token: accessToken,
     );
+    if (response.statusCode == 500) {
+      return null;
+    }
     final List<dynamic> data = response.data;
     return data.map((json) => Order.fromJson(json)).toList();
   }

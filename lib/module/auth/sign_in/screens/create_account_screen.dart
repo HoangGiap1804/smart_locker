@@ -1,32 +1,43 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smart_locker/models/shared/app_theme.dart';
 import 'package:smart_locker/module/auth/bloc/auth_bloc.dart';
 import 'package:smart_locker/module/auth/bloc/auth_event.dart';
 import 'package:smart_locker/module/auth/bloc/auth_state.dart';
+import 'package:smart_locker/module/auth/sign_in/screens/login_screen.dart';
 import 'package:smart_locker/module/auth/sign_in/widgets/button.dart';
 import 'package:smart_locker/module/auth/sign_in/widgets/gender_dropdown.dart';
 import 'package:smart_locker/module/auth/sign_in/widgets/text_field_input.dart';
 import 'package:smart_locker/module/auth/sign_in/widgets/text_field_input_password.dart';
 
-@RoutePage()
+// @RoutePage()
 class CreateAccountScreen extends StatefulWidget {
-  const CreateAccountScreen({super.key});
+  final XFile picture;
+  const CreateAccountScreen({super.key, required this.picture});
 
   @override
   State<CreateAccountScreen> createState() => _CreateAccountScreenState();
 }
 
 class _CreateAccountScreenState extends State<CreateAccountScreen> {
-  final TextEditingController _email = TextEditingController();
-  final TextEditingController _userName = TextEditingController();
-  final TextEditingController _fullName = TextEditingController();
-  final TextEditingController _phoneNumber = TextEditingController();
-  final TextEditingController _password = TextEditingController();
-  final TextEditingController _confirmPassword = TextEditingController();
+  final TextEditingController _email = TextEditingController(
+    text: "hgiap89@gmail.com",
+  );
+  final TextEditingController _userName = TextEditingController(text: "user");
+  final TextEditingController _fullName = TextEditingController(
+    text: "nguyen giap",
+  );
+  final TextEditingController _phoneNumber = TextEditingController(
+    text: "0129876543",
+  );
+  final TextEditingController _password = TextEditingController(text: "123456");
+  final TextEditingController _confirmPassword = TextEditingController(
+    text: "123456",
+  );
 
-  String? _selectGender;
+  String? _selectGender = "male";
 
   @override
   Widget build(BuildContext context) {
@@ -188,7 +199,12 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                   ),
                 )
                 : null;
-            (state is SignUpSucces) ? Navigator.pop(context) : null;
+            (state is SignUpSucces)
+                ? Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                )
+                : null;
           },
           builder: (context, state) {
             return state is AuthLoading
@@ -206,6 +222,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                         gender: _selectGender ?? "Female",
                         password: _password.text,
                         confirmPassword: _confirmPassword.text,
+                        picture: widget.picture,
                       ),
                     );
                   },
@@ -228,7 +245,8 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
             ),
             GestureDetector(
               onTap: () {
-                context.router.back();
+                // context.router.back();
+                Navigator.pop(context);
               },
               child: Text(" Login", style: AppTheme.textInk.bodyLarge),
             ),

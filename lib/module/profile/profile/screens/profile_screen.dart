@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:smart_locker/core/app/app_router.dart';
 import 'package:smart_locker/models/shared/app_theme.dart';
 import 'package:smart_locker/module/auth/repository/authentication_repository.dart';
+import 'package:smart_locker/module/auth/sign_in/screens/login_screen.dart';
 import 'package:smart_locker/module/profile/bloc/profile_bloc.dart';
 import 'package:smart_locker/module/profile/bloc/profile_event.dart';
 import 'package:smart_locker/module/profile/bloc/profile_state.dart';
@@ -15,6 +16,7 @@ import 'package:smart_locker/module/profile/profile/widgets/proflie_avata.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:smart_locker/services/storage_service.dart';
 
 @RoutePage()
 class ProfileScreen extends StatefulWidget {
@@ -115,10 +117,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: Text("Profile", style: AppTheme.textTheme.headlineMedium),
         centerTitle: true,
       ),
-      body:
-          (_isLoading)
-              ? Center(child: CircularProgressIndicator())
-              : _bodySection(context),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            (_isLoading)
+                ? Center(child: CircularProgressIndicator())
+                : _bodySection(context),
+
+            ProfileButton(
+              onTab: () {
+                AuthenticationRepository().signOut();
+                // context.router.replace(LoginRoute());
+
+
+                StorageService().saveTokens("", "");
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
+              },
+              text: "Logout",
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -127,7 +149,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       create: (context) => profileBloc,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 35),
-        child: ListView(
+        child: Column(
           children: [
             Container(
               alignment: Alignment.center,
@@ -211,14 +233,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               },
             ),
             SizedBox(height: 60),
-            ProfileButton(
-              onTab: () {
-                AuthenticationRepository().signOut();
-                context.router.replace(LoginRoute());
-              },
-              text: "Logout",
-            ),
-            SizedBox(height: 60),
+            // ProfileButton(
+            //   onTab: () {
+            //     AuthenticationRepository().signOut();
+            //     context.router.replace(LoginRoute());
+            //   },
+            //   text: "Logout",
+            // ),
+            // SizedBox(height: 60),
           ],
         ),
       ),

@@ -7,11 +7,15 @@ import 'package:smart_locker/models/shared/app_theme.dart';
 import 'package:smart_locker/module/auth/bloc/auth_bloc.dart';
 import 'package:smart_locker/module/auth/bloc/auth_event.dart';
 import 'package:smart_locker/module/auth/bloc/auth_state.dart';
+import 'package:smart_locker/module/auth/sign_in/screens/create_account_screen.dart';
+import 'package:smart_locker/module/auth/sign_in/screens/forgot_password_screen.dart';
 import 'package:smart_locker/module/auth/sign_in/widgets/button.dart';
 import 'package:smart_locker/module/auth/sign_in/widgets/button_circle_image.dart';
 import 'package:smart_locker/module/auth/sign_in/widgets/forgot_password.dart';
 import 'package:smart_locker/module/auth/sign_in/widgets/text_field_input.dart';
 import 'package:smart_locker/module/auth/sign_in/widgets/text_field_input_password.dart';
+import 'package:smart_locker/module/camera/camera/screens/camera_screen.dart';
+import 'package:smart_locker/module/home_page/screens/home_screen.dart';
 
 @RoutePage()
 class LoginScreen extends StatefulWidget {
@@ -35,13 +39,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
   // Async method to check if the user is logged in
   void _checkIfUserIsLoggedIn() async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      // If user is logged in, navigate to HomePage
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.router.replace(HomeRoute());
-      });
-    }
+    // User? user = FirebaseAuth.instance.currentUser;
+    // if (user != null) {
+    //   // If user is logged in, navigate to HomePage
+    //   WidgetsBinding.instance.addPostFrameCallback((_) {
+    //     context.router.replace(HomeRoute());
+    //   });
+    // }
   }
 
   @override
@@ -93,7 +97,12 @@ class _LoginScreenState extends State<LoginScreen> {
         _input(context),
         ForgotPassword(
           onTap: () {
-            context.router.push(ForgotPasswordRoute());
+            // context.router.push(ForgotPasswordRoute());
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
+            );
           },
         ),
         Padding(
@@ -115,7 +124,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     backgroundColor: Colors.green,
                   ),
                 );
-                context.router.replace(HomeRoute());
+                // context.router.replace(HomeRoute());
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomeScreen()),
+                );
               }
             },
             builder: (context, state) {
@@ -207,7 +220,13 @@ class _LoginScreenState extends State<LoginScreen> {
         Text("Create An Account ", style: AppTheme.textfield.bodyLarge),
         GestureDetector(
           onTap: () {
-            context.router.push(CreateAccountRoute());
+            // context.router.push(CreateAccountRoute());
+
+            Navigator.push(
+              context,
+              // MaterialPageRoute(builder: (context) => CreateAccountScreen()),
+              MaterialPageRoute(builder: (context) => CameraScreen()),
+            );
           },
           child: Text("Sign Up", style: AppTheme.textInk.bodyLarge),
         ),

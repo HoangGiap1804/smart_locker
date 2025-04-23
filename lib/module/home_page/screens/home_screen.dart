@@ -7,12 +7,10 @@ import 'package:smart_locker/module/home_page/bloc/home_bloc.dart';
 import 'package:smart_locker/module/home_page/bloc/home_event.dart';
 import 'package:smart_locker/module/home_page/bloc/home_state.dart';
 import 'package:smart_locker/module/home_page/screens/home_page.dart';
-import 'package:smart_locker/module/home_page/screens/locker_history_page.dart';
 import 'package:smart_locker/module/home_page/screens/locker_management_page.dart';
 import 'package:smart_locker/module/home_page/screens/search_package_page.dart';
-import 'package:smart_locker/module/home_page/screens/setting_page.dart';
 import 'package:smart_locker/module/home_page/screens/user_management_page.dart';
-import 'package:smart_locker/module/home_page/screens/video_history_page.dart';
+import 'package:smart_locker/module/profile/profile/screens/profile_screen.dart';
 
 @RoutePage()
 class HomeScreen extends StatelessWidget {
@@ -112,7 +110,12 @@ class HomeScreen extends StatelessWidget {
           actions: [
             GestureDetector(
               onTap: () {
-                context.router.push(ProfileRoute());
+                // context.router.push(ProfileRoute());
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProfileScreen()),
+                );
               },
               child: Container(
                 margin: EdgeInsets.all(10),
@@ -128,7 +131,7 @@ class HomeScreen extends StatelessWidget {
             if (state is HomeChangePage) {
               return IndexedStack(
                 index: state.index,
-                children: [HomePage(), SearchPackagePage(), SearchPackagePage(),],
+                children: [HomePage(), SearchPackagePage(), CameraScreen()],
               );
             }
             return HomePage();

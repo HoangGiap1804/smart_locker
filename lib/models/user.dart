@@ -1,3 +1,4 @@
+import 'package:camera/camera.dart';
 import 'package:json_annotation/json_annotation.dart';
 part 'user.g.dart';
 
@@ -14,6 +15,7 @@ class User {
   final String phoneNumber;
   final String gender;
   final String password;
+  final XFile? picture;
 
   User({
     this.id = 0,
@@ -23,6 +25,7 @@ class User {
     required this.phoneNumber,
     required this.gender,
     this.password = "",
+    this.picture,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);

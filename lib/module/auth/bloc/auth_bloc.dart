@@ -62,10 +62,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           phoneNumber: event.phoneNumber,
           gender: event.gender,
           password: event.password,
+          picture: event.picture,
         );
 
-        User user = await UserRepository(ApiService()).signUpUser(signup);
-        if(user != null){
+        bool success = await UserRepository(ApiService()).signUpUser(signup);
+        if (success) {
           emit(SignUpSucces());
         }
       } catch (e) {

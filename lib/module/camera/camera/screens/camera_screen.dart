@@ -1,8 +1,10 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:gal/gal.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:smart_locker/module/auth/sign_in/screens/create_account_screen.dart';
 
+@RoutePage()
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});
 
@@ -11,13 +13,14 @@ class CameraScreen extends StatefulWidget {
 }
 
 class _CameraScreenState extends State<CameraScreen> {
-  late CameraController _controller;
+  CameraController? _controller;
   late List<CameraDescription> cameras;
+  bool isCameraInitialized = false;
 
   @override
   void initState() {
-    initCamera();
     super.initState();
+    initCamera();
   }
 
   Future<void> initCamera() async {
@@ -26,88 +29,84 @@ class _CameraScreenState extends State<CameraScreen> {
       (camera) => camera.lensDirection == CameraLensDirection.front,
       orElse: () => cameras.first,
     );
+
     _controller = CameraController(frontCamera, ResolutionPreset.max);
-    _controller.initialize().then((_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {});
+    await _controller!.initialize();
+
+    if (!mounted) return;
+
+    setState(() {
+      isCameraInitialized = true;
     });
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final ImagePicker picker = ImagePicker();
-
-    Future<void> takePicture() async {
-      final XFile? image = await picker.pickImage(source: ImageSource.camera);
-      if (image == null) return;
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Ảnh đã được lưu vào thư viện!")));
+    if (!isCameraInitialized || _controller == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    if (!_controller.value.isInitialized) {
-      return Scaffold();
-    } else {
-      return Scaffold(
-        body: Center(
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Transform.flip(
-                flipX: true,
-                child: Transform.scale(
-                  scale: 2.5,
-                  child: Transform.rotate(
-                    angle: -3.14159 / 2,
-                    child: AspectRatio(
-                      aspectRatio: _controller.value.aspectRatio,
-                      child: CameraPreview(_controller),
-                    ),
+    return Scaffold(
+      body: Center(
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Transform.flip(
+              flipX: true,
+              child: Transform.scale(
+                scale: 2.5,
+                child: Transform.rotate(
+                  angle: -3.14159 / 2,
+                  child: AspectRatio(
+                    aspectRatio: _controller!.value.aspectRatio,
+                    child: CameraPreview(_controller!),
                   ),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 30),
-                child: Container(
-                  height: 400,
-                  decoration: ShapeDecoration(
-                    shape: OvalBorder(
-                      side: BorderSide(color: Colors.green, width: 5),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        floatingActionButton: Align(
-          alignment: Alignment.bottomCenter, // Căn giữa theo chiều ngang
-          child: Padding(
-            padding: EdgeInsets.only(
-              bottom: 20,
-            ), // Điều chỉnh khoảng cách từ dưới lên
-            child: FloatingActionButton(
-              onPressed: () async {
-                XFile picture = await _controller.takePicture();
-                Gal.putImage(picture.path);
-              },
-              backgroundColor: Colors.white,
-              shape: CircleBorder(),
-              child: Icon(Icons.camera),
             ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: Container(
+                height: 400,
+                decoration: ShapeDecoration(
+                  shape: OvalBorder(
+                    side: BorderSide(color: Colors.greenAccent, width: 5),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Align(
+        alignment: Alignment.bottomCenter,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 20),
+          child: FloatingActionButton(
+            onPressed: () async {
+              final picture = await _controller!.takePicture();
+              // Gal.putImage(picture.path);
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CreateAccountScreen(picture: picture),
+                ),
+              );
+            },
+            backgroundColor: Colors.white,
+            shape: const CircleBorder(),
+            child: const Icon(Icons.camera),
           ),
         ),
-      );
-    }
+      ),
+    );
   }
 }
