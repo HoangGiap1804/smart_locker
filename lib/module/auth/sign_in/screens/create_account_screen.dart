@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,20 +21,28 @@ class CreateAccountScreen extends StatefulWidget {
 }
 
 class _CreateAccountScreenState extends State<CreateAccountScreen> {
-  final TextEditingController _email = TextEditingController(
-    text: "hgiap89@gmail.com",
-  );
-  final TextEditingController _userName = TextEditingController(text: "user");
-  final TextEditingController _fullName = TextEditingController(
-    text: "nguyen giap",
-  );
-  final TextEditingController _phoneNumber = TextEditingController(
-    text: "0129876543",
-  );
-  final TextEditingController _password = TextEditingController(text: "123456");
-  final TextEditingController _confirmPassword = TextEditingController(
-    text: "123456",
-  );
+  // final TextEditingController _email = TextEditingController(
+  //   text: "hgiap89@gmail.com",
+  // );
+  // final TextEditingController _userName = TextEditingController(text: "user");
+  // final TextEditingController _fullName = TextEditingController(
+  //   text: "nguyen giap",
+  // );
+  // final TextEditingController _phoneNumber = TextEditingController(
+  //   text: "0129876543",
+  // );
+  // final TextEditingController _password = TextEditingController(text: "123456");
+  // final TextEditingController _confirmPassword = TextEditingController(
+  //   text: "123456",
+  // );
+  // String? _selectGender = "male";
+
+  final TextEditingController _email = TextEditingController();
+  final TextEditingController _userName = TextEditingController();
+  final TextEditingController _fullName = TextEditingController();
+  final TextEditingController _phoneNumber = TextEditingController();
+  final TextEditingController _password = TextEditingController();
+  final TextEditingController _confirmPassword = TextEditingController();
 
   String? _selectGender = "male";
 
@@ -190,45 +197,53 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     return Column(
       children: [
         BlocConsumer<AuthBloc, AuthState>(
-          listener: (context, state) {
-            (state is AuthError)
-                ? ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.error),
-                    backgroundColor: Colors.red,
+        listener: (context, state) {
+        (state is AuthError)
+          ? ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.error),
+              backgroundColor: Colors.red,
+            ),
+          )
+          : null;
+        (state is SignUpSucces)
+          ? {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => LoginScreen()),
+          ),
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Sign up successful"),
+              backgroundColor: Colors.green,
+            ),
+          ),
+        }
+          : null;
+        },
+        builder: (context, state) {
+          return state is AuthLoading
+            ? CircularProgressIndicator()
+            : Button(
+              text: "Create Account",
+              onTab: () {
+                FocusScope.of(context).unfocus();
+                context.read<AuthBloc>().add(
+                  SignUpSubmitted(
+                    userName: _userName.text,
+                    fullName: _fullName.text,
+                    email: _email.text,
+                    phoneNumber: _phoneNumber.text,
+                    gender: _selectGender ?? "Female",
+                    password: _password.text,
+                    confirmPassword: _confirmPassword.text,
+                    picture: widget.picture,
                   ),
-                )
-                : null;
-            (state is SignUpSucces)
-                ? Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()),
-                )
-                : null;
-          },
-          builder: (context, state) {
-            return state is AuthLoading
-                ? CircularProgressIndicator()
-                : Button(
-                  text: "Create Account",
-                  onTab: () {
-                    FocusScope.of(context).unfocus();
-                    context.read<AuthBloc>().add(
-                      SignUpSubmitted(
-                        userName: _userName.text,
-                        fullName: _fullName.text,
-                        email: _email.text,
-                        phoneNumber: _phoneNumber.text,
-                        gender: _selectGender ?? "Female",
-                        password: _password.text,
-                        confirmPassword: _confirmPassword.text,
-                        picture: widget.picture,
-                      ),
-                    );
-                  },
                 );
-          },
-        ),
+              },
+            );
+        },
+      ),
       ],
     );
   }

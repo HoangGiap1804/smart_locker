@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:smart_locker/models/locker_history_model.dart';
 import 'package:smart_locker/models/locker_model.dart';
 import 'package:smart_locker/module/home_page/screens/locker_history_page.dart';
 

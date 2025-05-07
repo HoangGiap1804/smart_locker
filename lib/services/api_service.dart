@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 
 class ApiService {
-  final Dio _dio = Dio(BaseOptions(baseUrl: 'http://192.168.196.137:8000/'));
+  final Dio _dio = Dio(BaseOptions(baseUrl: 'http://192.168.1.55:8000/'));
 
   // Hàm GET
   Future<Response> get(
@@ -44,7 +44,6 @@ class ApiService {
       throw Exception('POST request failed: ${e.message}');
     }
   }
-
 
   Future<Response> put(String endpoint, {String? token}) async {
     return await _dio.put(

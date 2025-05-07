@@ -1,19 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
-// Future<String> fetchVideoUrl() async {
-//   final response = await http.get(
-//     Uri.parse('https://vip.opstream16.com/20230114/29210_45f6d896/index.m3u8'),
-//   );
-//   if (response.statusCode == 200) {
-//     final data = jsonDecode(response.body);
-//     return data['videoUrl'];
-//   } else {
-//     throw Exception('Failed to load video');
-//   }
-// }
 
 class VideoHistoryPage extends StatefulWidget {
   const VideoHistoryPage({super.key});

@@ -49,13 +49,16 @@ class _HomePageState extends State<HomePage> {
           children: [
             Text("Your Packages", style: AppTheme.textTheme.headlineMedium),
             Column(
-              children:[
-                ...List.generate(listOrder.length, (index) => Package(
-                  idOrder: listOrder[index].orderId,
-                  status: listOrder[index].status,
-                  timeDelevery: DateTime.parse(listOrder[index].createAt)
-                )),
-              ]
+              children: [
+                ...List.generate(
+                  listOrder.length,
+                  (index) => Package(
+                    idOrder: listOrder[index].orderId,
+                    status: listOrder[index].status,
+                    timeDelevery: DateTime.parse(listOrder[index].createAt),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

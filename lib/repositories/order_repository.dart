@@ -1,9 +1,5 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:smart_locker/models/order.dart';
-
-import '../models/user.dart';
 import '../services/api_service.dart';
 
 class OrderRepository {
@@ -19,10 +15,8 @@ class OrderRepository {
         token: accessToken,
       );
       return Order.fromJson(response.data);
-    } on DioException catch (e) {
-      if (e.response?.statusCode == 404) {
-        return null;
-      }
+    } on DioException {
+      return null;
     }
   }
 
@@ -31,8 +25,8 @@ class OrderRepository {
       'api/orders/list-products/',
       token: accessToken,
     );
-    if (response.statusCode == 500) {
-      return null;
+    if (response.statusCode == 404) {
+      return [];
     }
     final List<dynamic> data = response.data;
     return data.map((json) => Order.fromJson(json)).toList();

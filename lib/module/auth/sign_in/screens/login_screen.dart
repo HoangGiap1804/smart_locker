@@ -1,13 +1,10 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:smart_locker/core/app/app_router.dart';
 import 'package:smart_locker/models/shared/app_theme.dart';
 import 'package:smart_locker/module/auth/bloc/auth_bloc.dart';
 import 'package:smart_locker/module/auth/bloc/auth_event.dart';
 import 'package:smart_locker/module/auth/bloc/auth_state.dart';
-import 'package:smart_locker/module/auth/sign_in/screens/create_account_screen.dart';
 import 'package:smart_locker/module/auth/sign_in/screens/forgot_password_screen.dart';
 import 'package:smart_locker/module/auth/sign_in/widgets/button.dart';
 import 'package:smart_locker/module/auth/sign_in/widgets/button_circle_image.dart';
@@ -183,7 +180,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
   }
 
-  Widget _loginOther() {
+  Widget loginOther() {
     return Column(
       children: [
         Center(

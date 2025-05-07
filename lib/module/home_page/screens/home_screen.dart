@@ -1,7 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:smart_locker/core/app/app_router.dart';
 import 'package:smart_locker/module/camera/camera/screens/camera_screen.dart';
 import 'package:smart_locker/module/home_page/bloc/home_bloc.dart';
 import 'package:smart_locker/module/home_page/bloc/home_event.dart';
@@ -12,10 +11,14 @@ import 'package:smart_locker/module/home_page/screens/search_package_page.dart';
 import 'package:smart_locker/module/home_page/screens/user_management_page.dart';
 import 'package:smart_locker/module/profile/profile/screens/profile_screen.dart';
 
-@RoutePage()
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return homeUser(context);
@@ -29,15 +32,6 @@ class HomeScreen extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: Colors.white,
           surfaceTintColor: Colors.white,
-          leading: Container(
-            margin: EdgeInsets.all(10),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: Color(0xFFf2f2f2),
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: Icon(Icons.menu),
-          ),
           actions: [
             GestureDetector(
               onTap: () {
@@ -128,13 +122,18 @@ class HomeScreen extends StatelessWidget {
         ),
         body: BlocBuilder<HomeBloc, HomeState>(
           builder: (context, state) {
-            if (state is HomeChangePage) {
-              return IndexedStack(
-                index: state.index,
-                children: [HomePage(), SearchPackagePage(), CameraScreen()],
-              );
-            }
-            return HomePage();
+            final index = (state is HomeChangePage) ? state.index : 0;
+            return getPage(index);
+            // if (state is HomeChangePage) {
+            // return IndexedStack(
+            //   index: state.index,
+            //   children: [
+            //     HomePage(),
+            //     SearchPackagePage(),
+            //     // CameraScreen(),
+            //   ],
+            // );
+            // }
           },
         ),
         bottomNavigationBar: BlocBuilder<HomeBloc, HomeState>(
@@ -152,15 +151,22 @@ class HomeScreen extends StatelessWidget {
                   icon: Icon(Icons.search),
                   label: "Search",
                 ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.settings),
-                  label: "Setting",
-                ),
               ],
             );
           },
         ),
       ),
     );
+  }
+
+  Widget getPage(int index) {
+    switch (index) {
+      case 0:
+        return HomePage();
+      case 1:
+        return SearchPackagePage();
+      default:
+        return HomePage();
+    }
   }
 }

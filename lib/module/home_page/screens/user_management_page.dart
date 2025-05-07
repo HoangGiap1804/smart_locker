@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:smart_locker/models/locker_history_model.dart';
 import 'package:smart_locker/models/user_model.dart';
 
 class UserManagementPage extends StatefulWidget {

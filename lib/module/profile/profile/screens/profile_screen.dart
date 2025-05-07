@@ -1,7 +1,5 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:smart_locker/core/app/app_router.dart';
 import 'package:smart_locker/models/shared/app_theme.dart';
-import 'package:smart_locker/module/auth/repository/authentication_repository.dart';
+import 'package:smart_locker/models/user.dart';
 import 'package:smart_locker/module/auth/sign_in/screens/login_screen.dart';
 import 'package:smart_locker/module/profile/bloc/profile_bloc.dart';
 import 'package:smart_locker/module/profile/bloc/profile_event.dart';
@@ -13,12 +11,10 @@ import 'package:smart_locker/module/profile/profile/widgets/profile_image_button
 import 'package:smart_locker/module/profile/profile/widgets/profile_textfield_input.dart';
 import 'package:smart_locker/module/profile/profile/widgets/profile_textfield_password_input.dart';
 import 'package:smart_locker/module/profile/profile/widgets/proflie_avata.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smart_locker/services/storage_service.dart';
 
-@RoutePage()
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -28,69 +24,29 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController email = TextEditingController();
-  final TextEditingController password = TextEditingController();
+  final TextEditingController userName = TextEditingController();
+  final TextEditingController fullName = TextEditingController();
+  final TextEditingController phoneNumber = TextEditingController();
+  final TextEditingController gender = TextEditingController();
 
-  final TextEditingController pincode = TextEditingController();
-  final TextEditingController address = TextEditingController();
-  final TextEditingController city = TextEditingController();
-  final TextEditingController state = TextEditingController();
-  final TextEditingController country = TextEditingController();
-
-  final TextEditingController bankAccountNumber = TextEditingController();
-  final TextEditingController accountHolderName = TextEditingController();
-  final TextEditingController ifscCode = TextEditingController();
-
-  ProfileModel _profileModel = ProfileModel.empty();
   bool _isLoading = true;
   ProfileBloc profileBloc = ProfileBloc();
 
   @override
   void initState() {
     super.initState();
-    _loadProfileData();
+    getUser();
   }
 
-  Future<void> _loadProfileData() async {
-    try {
-      String? uid = FirebaseAuth.instance.currentUser?.uid;
-      if (uid != null) {
-        // ProfileModel profile = await ProfileRepository().getUserInfo(uid);
-        setState(() {
-          //_profileModel = profile;
-          // if(profile.username != "") _isLoading = false;
-          _isLoading = false;
-          return;
-
-          // email.text = profile.username;
-          // password.text = profile.password;
-          // pincode.text = profile.pincode;
-          // address.text = profile.address;
-          // city.text = profile.city;
-          // state.text = profile.state;
-          // country.text = profile.country;
-          // bankAccountNumber.text = profile.bankAccountNumber;
-          // accountHolderName.text = profile.accountHolderName;
-          // ifscCode.text = profile.ifscCode;
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _isLoading = true;
-      });
-    }
-  }
-
-  void get() {
+  void getUser() async {
+    User user = await StorageService().getUser();
     setState(() {
-      _profileModel.username = email.text;
-      _profileModel.pincode = pincode.text;
-      _profileModel.address = address.text;
-      _profileModel.city = city.text;
-      _profileModel.state = state.text;
-      _profileModel.country = country.text;
-      _profileModel.bankAccountNumber = bankAccountNumber.text;
-      _profileModel.accountHolderName = accountHolderName.text;
-      _profileModel.ifscCode = ifscCode.text;
+      email.text = user.email;
+      userName.text = user.userName;
+      fullName.text = user.fullName;
+      phoneNumber.text = user.phoneNumber;
+      gender.text = user.gender;
+      _isLoading = false;
     });
   }
 
@@ -102,7 +58,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: Colors.white,
         leading: GestureDetector(
           onTap: () {
-            context.router.back();
+            Navigator.pop(context);
           },
           child: Container(
             margin: EdgeInsets.all(10),
@@ -126,10 +82,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             ProfileButton(
               onTab: () {
-                AuthenticationRepository().signOut();
+                // AuthenticationRepository().signOut();
                 // context.router.replace(LoginRoute());
 
-
+                StorageService().clearStorage();
                 StorageService().saveTokens("", "");
                 Navigator.pushReplacement(
                   context,
@@ -138,6 +94,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               },
               text: "Logout",
             ),
+            SizedBox(height: 50),
           ],
         ),
       ),
@@ -172,8 +129,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               hintText: "Email address",
               textEditingController: email,
             ),
-            SizedBox(height: 25),
-            ProfileTextfieldPasswordInput(textEditingController: password),
+            // SizedBox(height: 25),
+            // ProfileTextfieldPasswordInput(textEditingController: password),
             SizedBox(height: 15),
             ChangePassword(onTap: () {}),
             SizedBox(height: 25),
@@ -182,65 +139,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Text("Address detail", style: AppTheme.textTheme.headlineSmall),
             SizedBox(height: 25),
             ProfileTextfieldInput(
-              header: "Address",
-              hintText: "Address",
-              textEditingController: address,
+              header: "User name",
+              hintText: "User name",
+              textEditingController: userName,
             ),
             SizedBox(height: 25),
             ProfileTextfieldInput(
-              header: "City",
-              hintText: "City",
-              textEditingController: city,
+              header: "Full name",
+              hintText: "Full name",
+              textEditingController: fullName,
             ),
             SizedBox(height: 25),
             ProfileTextfieldInput(
-              header: "Country",
-              hintText: "Country",
-              textEditingController: country,
+              header: "Phone number",
+              hintText: "Phone number",
+              textEditingController: phoneNumber,
             ),
-            SizedBox(height: 40),
-            BlocConsumer<ProfileBloc, ProfileState>(
-              listener: (context, state) {
-                (state is SubmissionFaild)
-                    ? ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(state.error),
-                        backgroundColor: Colors.red,
-                      ),
-                    )
-                    : null;
-                (state is SubmissionSuccess)
-                    ? ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text("Update success"),
-                        backgroundColor: Colors.green,
-                      ),
-                    )
-                    : null;
-              },
-              builder: (context, state) {
-                return (state is ProfileLoading)
-                    ? Center(child: CircularProgressIndicator())
-                    : ProfileButton(
-                      onTab: () {
-                        get();
-                        context.read<ProfileBloc>().add(
-                          UpdateInfo(profileModel: _profileModel),
-                        );
-                      },
-                      text: "Save",
-                    );
-              },
+            SizedBox(height: 25),
+            ProfileTextfieldInput(
+              header: "Gender",
+              hintText: "Gender",
+              textEditingController: gender,
             ),
-            SizedBox(height: 60),
-            // ProfileButton(
-            //   onTab: () {
-            //     AuthenticationRepository().signOut();
-            //     context.router.replace(LoginRoute());
-            //   },
-            //   text: "Logout",
-            // ),
-            // SizedBox(height: 60),
+            SizedBox(height: 50),
           ],
         ),
       ),

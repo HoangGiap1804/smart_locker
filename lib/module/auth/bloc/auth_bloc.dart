@@ -2,13 +2,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smart_locker/models/user.dart';
 import 'package:smart_locker/module/auth/bloc/auth_event.dart';
 import 'package:smart_locker/module/auth/bloc/auth_state.dart';
-import 'package:smart_locker/module/auth/repository/authentication_repository.dart';
 import 'package:smart_locker/repositories/user_repository.dart';
 import 'package:smart_locker/services/api_service.dart';
+import 'package:smart_locker/services/storage_service.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  final _auth = AuthenticationRepository();
-
   AuthBloc() : super(AuthInital()) {
     on<UsernameChanged>((event, emit) {
       String username = event.username;
@@ -41,6 +39,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         User user = await UserRepository(
           ApiService(),
         ).signInUser(username, password);
+
+        StorageService().saveUser(user);
 
         if (user != null) {
           emit(LoginSucces());
@@ -76,21 +76,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     on<ForgotPasswordSubmitted>((event, emit) async {
       emit(AuthLoading());
-      try {
-        String username = event.username;
+      // try {
+      //   String username = event.username;
 
-        String res = await AuthenticationRepository().forgotPassword(
-          username: username,
-        );
+      //   String res = await AuthenticationRepository().forgotPassword(
+      //     username: username,
+      //   );
 
-        if (res == "success") {
-          emit(SendEmailSuccess());
-        } else {
-          emit(SendEmailFaild(error: res));
-        }
-      } catch (e) {
-        emit(SendEmailFaild(error: e.toString()));
-      }
+      //   if (res == "success") {
+      //     emit(SendEmailSuccess());
+      //   } else {
+      //     emit(SendEmailFaild(error: res));
+      //   }
+      // } catch (e) {
+      //   emit(SendEmailFaild(error: e.toString()));
+      // }
     });
   }
 }
