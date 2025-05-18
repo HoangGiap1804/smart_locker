@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:dio/dio.dart';
+import 'package:smart_locker/models/user_active.dart';
 import 'package:smart_locker/services/storage_service.dart';
 
 import '../models/user.dart';
@@ -56,5 +57,38 @@ class UserRepository {
     } else {
       throw Exception(response.data['error']);
     }
+  }
+
+  Future<List<UserActive>> getAllUsers() async {
+    String? accessToken = await StorageService().getAccessToken();
+    if (accessToken != null) {
+      print("access token ${accessToken!}");
+      final response = await apiService.get('api/admin/users/', token: accessToken);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data['data'];
+        return data.map((e) => UserActive.fromJson(e)).toList();
+      } else {
+        // throw Exception('Failed to fetch users');
+      }
+    }
+    return [];
+  }
+
+  // Optional: Toggle user active status (nếu backend hỗ trợ)
+  Future<bool> toggleUserActive(int userId, bool isActive) async {
+    try {
+      String? accessToken = await StorageService().getAccessToken();
+      if (accessToken != null) {
+        await apiService.post1('api/admin/users/toggle-status/', {
+          'user_id': userId,
+          'is_active': isActive ? "True" : "False",
+        }, accessToken);
+        return true;
+      }
+    } catch (e) {
+      print("toggle user: ${e.toString()}");
+    }
+    return false;
   }
 }

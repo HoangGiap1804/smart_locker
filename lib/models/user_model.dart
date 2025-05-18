@@ -1,34 +1,26 @@
-import 'dart:math';
+import 'package:json_annotation/json_annotation.dart';
 
-import 'package:flutter/widgets.dart';
+part 'user_model.g.dart';
 
+@JsonSerializable()
 class UserModel {
-  final String name;
-  final String phoneNumber;
-  final Image image;
-  final bool paid;
+  final int id;
+  final String username;
+  final String email;
+  final String fullname;
+  final String phone;
+  final String gender;
 
   UserModel({
-    required this.name,
-    required this.phoneNumber,
-    required this.image,
-    required this.paid,
+    required this.id,
+    required this.username,
+    required this.email,
+    required this.fullname,
+    required this.phone,
+    required this.gender,
   });
 
-  static List<UserModel> listUser(int n) {
-    List<UserModel> list = [];
-    Random random = Random();
-
-    for (int i = 0; i < n; ++i) {
-      list.add(
-        UserModel(
-          name: "Nguyen Van A",
-          phoneNumber: "0923987487",
-          image: Image.asset("assets/images/avata.png"),
-          paid: random.nextBool(),
-        ),
-      );
-    }
-    return list;
-  }
+  factory UserModel.fromJson(Map<String, dynamic> json) =>
+      _$UserModelFromJson(json);
+  Map<String, dynamic> toJson() => _$UserModelToJson(this);
 }

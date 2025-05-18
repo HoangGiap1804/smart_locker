@@ -15,6 +15,7 @@ class User {
   final String phoneNumber;
   final String gender;
   final String password;
+  @JsonKey(ignore: true)
   final XFile? picture;
 
   User({

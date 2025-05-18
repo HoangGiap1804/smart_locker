@@ -7,6 +7,7 @@ import 'package:smart_locker/module/home_page/bloc/home_event.dart';
 import 'package:smart_locker/module/home_page/bloc/home_state.dart';
 import 'package:smart_locker/module/home_page/screens/home_page.dart';
 import 'package:smart_locker/module/home_page/screens/locker_management_page.dart';
+import 'package:smart_locker/module/home_page/screens/search_order_page.dart';
 import 'package:smart_locker/module/home_page/screens/search_package_page.dart';
 import 'package:smart_locker/module/home_page/screens/user_management_page.dart';
 import 'package:smart_locker/module/profile/profile/screens/profile_screen.dart';
@@ -21,7 +22,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-    return homeUser(context);
+    return homeAdmin();
   }
 
   Widget homeAdmin() {
@@ -54,6 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   UserManagementPage(),
                   LockerManagementPage(),
+                  SearchOrderPage()
                   // VideoHistoryPage(),
                 ],
               );
@@ -72,6 +74,10 @@ class _HomeScreenState extends State<HomeScreen> {
               },
               items: const [
                 BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.window),
+                  label: "Lockers",
+                ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.search),
                   label: "Search",
