@@ -16,6 +16,16 @@ class _CameraScreenState extends State<CameraScreen> {
   CameraController? _controller;
   late List<CameraDescription> cameras;
   bool isCameraInitialized = false;
+  int index = 0;
+  List<XFile> pictures = [];
+  List<String> listTitle = [
+    "Take a front-facing photo",
+    "Take a slightly right-angled photo",
+    "Take a slightly left-angled photo",
+    "Take a photo with a slight downward tilt of the head",
+    "Take a photo with a slight upward tilt of the head",
+    "Finish"
+  ];
 
   @override
   void initState() {
@@ -81,6 +91,46 @@ class _CameraScreenState extends State<CameraScreen> {
                 ),
               ),
             ),
+            Align(
+              alignment: Alignment.topCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 100),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "Step ${index + 1} of 5",
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white70,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        transitionBuilder: (child, animation) => FadeTransition(
+                          opacity: animation,
+                          child: child,
+                        ),
+                        child: Text(
+                          listTitle[index],
+                          key: ValueKey(index),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            )
           ],
         ),
       ),
@@ -93,14 +143,20 @@ class _CameraScreenState extends State<CameraScreen> {
             onPressed: () async {
               final picture = await _controller!.takePicture();
               // Gal.putImage(picture.path);
-              List<XFile> pictures = [picture, picture];
+              pictures.add(picture);
+              setState(() {
+                index++;
+              });
 
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CreateAccountScreen(pictures: pictures),
-                ),
-              );
+              if (index == 5) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (context) => CreateAccountScreen(pictures: pictures),
+                  ),
+                );
+              }
             },
             backgroundColor: Colors.white,
             shape: const CircleBorder(),
