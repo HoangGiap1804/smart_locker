@@ -20,81 +20,103 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   bool set = false;
 
   void confirmOrder() async {
-    setState(() {
-      isLoading = true;
-    });
-    String? accessToken = await StorageService().getAccessToken();
+    setState(() => isLoading = true);
 
+    String? accessToken = await StorageService().getAccessToken();
     if (accessToken != null) {
       set = await OrderRepository(
         ApiService(),
       ).confirmOrder(widget.order.orderId, accessToken);
     }
+
     setState(() {
       isLoading = false;
-      if (set) {
-        text = "SUCCESS";
-      } else {
-        text = "FAIL";
-      }
+      text = set ? "SUCCESS" : "FAIL";
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final dateTime = DateTime.parse(widget.order.createAt);
-    final localTime = dateTime.toLocal();
-    final formatter = DateFormat('mm:HH dd/MM/yyyy');
-    final formatted = formatter.format(localTime);
+    final dateTime = DateTime.parse(widget.order.createAt).toLocal();
+    final formattedTime = DateFormat('HH:mm dd/MM/yyyy').format(dateTime);
+
+    Color getStatusColor(String status) {
+      switch (status.toLowerCase()) {
+        case 'pending':
+          return Colors.orangeAccent;
+        case 'delivered':
+          return Colors.green;
+        case 'canceled':
+          return Colors.red;
+        default:
+          return Colors.grey;
+      }
+    }
+
     return Scaffold(
-      appBar: AppBar(title: Text("Order Detail")),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "ID Order: ${widget.order.orderId}",
-                style: TextStyle(fontSize: 20),
+      appBar: AppBar(title: const Text("Order Detail"), centerTitle: true),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
               ),
-              Text(
-                "Status: ${widget.order.status}",
-                style: TextStyle(fontSize: 18),
-              ),
-              Text(
-                "Time delevely:\n${formatted}",
-                style: TextStyle(fontSize: 18),
-              ),
-              (text.isEmpty)
-                  ? SizedBox()
-                  : Center(
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color:
-                            (text == "SUCCESS")
-                                ? Colors.greenAccent
-                                : Colors.redAccent,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Order ID: ${widget.order.orderId}",
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
-                      child: Text(text, style: TextStyle(fontSize: 18)),
                     ),
-                  ),
-              (isLoading)
-                  ? Center(child: CircularProgressIndicator())
-                  : Padding(
-                    padding: const EdgeInsets.only(top: 20),
-                    child: ProfileButton(
-                      onTab: () {
-                        confirmOrder();
-                      },
-                      text: "CONFIRM",
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        const Text("Status: ", style: TextStyle(fontSize: 18)),
+                        Chip(
+                          label: Text(widget.order.status),
+                          backgroundColor: getStatusColor(widget.order.status),
+                          labelStyle: const TextStyle(color: Colors.white),
+                        ),
+                      ],
                     ),
-                  ),
-            ],
-          ),
+                    const SizedBox(height: 10),
+                    Text(
+                      "Delivery Time: $formattedTime",
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 30),
+            if (text.isNotEmpty)
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color:
+                      (text == "SUCCESS")
+                          ? Colors.greenAccent
+                          : Colors.redAccent,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(text, style: const TextStyle(fontSize: 16)),
+              ),
+            const SizedBox(height: 20),
+            isLoading
+                ? const CircularProgressIndicator()
+                : ProfileButton(onTab: confirmOrder, text: "CONFIRM"),
+          ],
         ),
       ),
     );

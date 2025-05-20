@@ -12,6 +12,7 @@ import 'package:smart_locker/module/auth/sign_in/widgets/forgot_password.dart';
 import 'package:smart_locker/module/auth/sign_in/widgets/text_field_input.dart';
 import 'package:smart_locker/module/auth/sign_in/widgets/text_field_input_password.dart';
 import 'package:smart_locker/module/camera/camera/screens/camera_screen.dart';
+import 'package:smart_locker/module/home_page/screens/admin_screen.dart';
 import 'package:smart_locker/module/home_page/screens/home_screen.dart';
 
 @RoutePage()
@@ -125,10 +126,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 );
                 // context.router.replace(HomeRoute());
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => HomeScreen()),
-                );
+                if (state.isAdmin) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => AdminScreen()),
+                  );
+                } else {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => HomeScreen()),
+                  );
+                }
               }
             },
             builder: (context, state) {

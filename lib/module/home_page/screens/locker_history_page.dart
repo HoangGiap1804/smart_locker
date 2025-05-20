@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:smart_locker/models/product_history.dart';
 import 'package:smart_locker/module/home_page/screens/video_history_page.dart';
 import 'package:smart_locker/repositories/locker_repository.dart';
@@ -24,54 +25,92 @@ class _LockerHistoryPageState extends State<LockerHistoryPage> {
     ).fetchHistory(widget.lockerId);
   }
 
+  String formatDateTime(DateTime dateTime) {
+    return DateFormat('dd/MM/yyyy HH:mm').format(dateTime.toLocal());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Locker History')),
-      body: FutureBuilder<List<ProductHistory>>(
-        future: futureHistory,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-          final listHistory = snapshot.data ?? [];
+      body: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: FutureBuilder<List<ProductHistory>>(
+          future: futureHistory,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            }
 
-          if (listHistory.isEmpty) {
-            return const Center(child: Text("No history found."));
-          }
+            final listHistory = snapshot.data ?? [];
 
-          return ListView.builder(
-            itemCount: listHistory.length,
-            itemBuilder: (context, index) {
-              final history = listHistory[index];
-              return ListTile(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder:
-                          (context) => VideoHistoryPage(
-                            productId: listHistory[index].id,
-                          ),
+            if (listHistory.isEmpty) {
+              return const Center(child: Text("No history found."));
+            }
+
+            return ListView.separated(
+              itemCount: listHistory.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              itemBuilder: (context, index) {
+                final history = listHistory[index];
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => VideoHistoryPage(productId: history.id),
+                      ),
+                    );
+                  },
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                  );
-                },
-                title: Text('Order ID: ${history.orderId}'),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Created at: ${history.createdAt.toLocal()}'),
-                    Text('Updated at: ${history.updatedAt.toLocal()}'),
-                  ],
-                ),
-                isThreeLine: true,
-              );
-            },
-          );
-        },
+                    elevation: 3,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.inventory_2,
+                            size: 36,
+                            color: Colors.blueAccent,
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Order ID: ${history.orderId}',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  'Created: ${formatDateTime(history.createdAt)}',
+                                ),
+                                Text(
+                                  'Updated: ${formatDateTime(history.updatedAt)}',
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.chevron_right, color: Colors.grey),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }

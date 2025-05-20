@@ -21,15 +21,19 @@ class OrderRepository {
   }
 
   Future<List<Order>?> getListOrder(String accessToken) async {
-    final response = await apiService.get(
-      'api/orders/list-products/',
-      token: accessToken,
-    );
-    if (response.statusCode == 404) {
-      return [];
+    try {
+      final response = await apiService.get(
+        'api/orders/list-products/',
+        token: accessToken,
+      );
+      if (response.statusCode == 404) {
+        return [];
+      }
+      final List<dynamic> data = response.data;
+      return data.map((json) => Order.fromJson(json)).toList();
+    } catch (e) {
+      print("error get list product");
     }
-    final List<dynamic> data = response.data;
-    return data.map((json) => Order.fromJson(json)).toList();
   }
 
   Future<bool> confirmOrder(String orderId, String accessToken) async {

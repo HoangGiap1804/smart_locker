@@ -15,8 +15,10 @@ class User {
   final String phoneNumber;
   final String gender;
   final String password;
+  @JsonKey(name: "is_admin")
+  final bool isAdmin;
   @JsonKey(ignore: true)
-  final XFile? picture;
+  final List<XFile>? pictures;
 
   User({
     this.id = 0,
@@ -25,8 +27,9 @@ class User {
     required this.email,
     required this.phoneNumber,
     required this.gender,
+    this.isAdmin = false,
     this.password = "",
-    this.picture,
+    this.pictures,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);

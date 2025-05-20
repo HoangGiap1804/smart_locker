@@ -15,57 +15,78 @@ class SearchPackagePage extends StatefulWidget {
 }
 
 class _SearchPackagePageState extends State<SearchPackagePage> {
-  TextEditingController controller = TextEditingController();
-  String text = "";
+  final TextEditingController controller = TextEditingController();
+  String resultMessage = "";
   bool isLoading = false;
 
-  void searchOrder() async {
+  Future<void> searchOrder() async {
+    FocusScope.of(context).unfocus(); // Dismiss keyboard
+
     setState(() {
       isLoading = true;
+      resultMessage = "";
     });
+
     String? accessToken = await StorageService().getAccessToken();
 
-    Order? order;
     if (accessToken != null) {
-      order = await OrderRepository(
+      final order = await OrderRepository(
         ApiService(),
-      ).searchOrder(controller.text, accessToken);
+      ).searchOrder(controller.text.trim(), accessToken);
+
+      setState(() {
+        isLoading = false;
+        if (order != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OrderDetailPage(order: order),
+            ),
+          );
+        } else {
+          resultMessage = "No order found with that ID.";
+        }
+      });
+    } else {
+      setState(() {
+        isLoading = false;
+        resultMessage = "Authentication failed. Please log in again.";
+      });
     }
-    setState(() {
-      isLoading = false;
-      if (order != null) {
-        text = "Success";
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => OrderDetailPage(order: order!),
-          ),
-        );
-      } else {
-        text = "Fail";
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const Text(
+            "Enter your order ID to search:",
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 16),
           SearchField(controller: controller),
-          (text.isEmpty) ? SizedBox() : Text(text),
-          (isLoading)
-              ? CircularProgressIndicator()
-              : Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: ProfileButton(
-                  onTab: () {
-                    searchOrder();
-                  },
-                  text: "FIND",
-                ),
+          const SizedBox(height: 12),
+          if (resultMessage.isNotEmpty)
+            Text(
+              resultMessage,
+              style: TextStyle(
+                color:
+                    resultMessage.contains("No order") ||
+                            resultMessage.contains("Authentication")
+                        ? Colors.red
+                        : Colors.green,
+                fontSize: 14,
+              ),
+            ),
+          const SizedBox(height: 24),
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : SizedBox(
+                width: double.infinity,
+                child: ProfileButton(text: "SEARCH", onTab: searchOrder),
               ),
         ],
       ),

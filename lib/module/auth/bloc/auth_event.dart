@@ -29,7 +29,7 @@ class SignUpSubmitted extends AuthEvent {
   final String gender;
   final String password;
   final String confirmPassword;
-  final XFile picture;
+  final List<XFile> pictures;
 
   SignUpSubmitted({
     required this.userName,
@@ -39,7 +39,7 @@ class SignUpSubmitted extends AuthEvent {
     required this.gender,
     required this.password,
     required this.confirmPassword,
-    required this.picture,
+    required this.pictures,
   });
 }
 

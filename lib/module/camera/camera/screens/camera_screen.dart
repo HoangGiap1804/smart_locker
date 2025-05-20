@@ -93,11 +93,12 @@ class _CameraScreenState extends State<CameraScreen> {
             onPressed: () async {
               final picture = await _controller!.takePicture();
               // Gal.putImage(picture.path);
+              List<XFile> pictures = [picture, picture];
 
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => CreateAccountScreen(picture: picture),
+                  builder: (context) => CreateAccountScreen(pictures: pictures),
                 ),
               );
             },

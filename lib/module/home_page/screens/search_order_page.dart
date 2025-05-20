@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smart_locker/models/product_history_detail.dart';
 import 'package:smart_locker/repositories/locker_repository.dart';
-import 'package:smart_locker/services/api_service.dart'; // giả định bạn có service
-import 'package:video_player/video_player.dart'; // nếu cần dùng video
+import 'package:smart_locker/services/api_service.dart';
 
 class SearchOrderPage extends StatefulWidget {
   const SearchOrderPage({super.key});
@@ -15,31 +14,32 @@ class _SearchOrderPageState extends State<SearchOrderPage> {
   final TextEditingController _controller = TextEditingController();
   ProductHistoryDetail? _result;
   bool _isLoading = false;
-  String? _error;
+  String? _errorMessage;
 
   Future<void> _searchOrder() async {
-    final orderIdText = _controller.text.trim();
-    if (orderIdText.isEmpty) return;
+    final orderId = _controller.text.trim();
+    if (orderId.isEmpty) return;
 
     setState(() {
       _isLoading = true;
-      _error = null;
+      _errorMessage = null;
       _result = null;
     });
 
     try {
-      if (int.tryParse(orderIdText) != null) {
-        final detail = await LockerRepository(
-          ApiService(),
-        ).fetchProductHistoryDetail(int.parse(orderIdText));
+      final id = int.tryParse(orderId);
+      if (id != null) {
+        final detail = await LockerRepository(ApiService()).fetchProductHistoryDetail(id);
         if (detail != null) {
           setState(() => _result = detail);
         } else {
-          setState(() => _error = "Không tìm thấy đơn hàng");
+          setState(() => _errorMessage = "Order not found.");
         }
+      } else {
+        setState(() => _errorMessage = "Invalid order ID.");
       }
     } catch (e) {
-      setState(() => _error = "Đã xảy ra lỗi: $e");
+      setState(() => _errorMessage = "An error occurred: $e");
     } finally {
       setState(() => _isLoading = false);
     }
@@ -48,55 +48,120 @@ class _SearchOrderPageState extends State<SearchOrderPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Tìm kiếm đơn hàng")),
+      appBar: AppBar(title: const Text("Search Order")),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            TextField(
-              controller: _controller,
-              decoration: InputDecoration(
-                labelText: "Nhập mã đơn hàng",
-                border: OutlineInputBorder(),
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.search),
-                  onPressed: _searchOrder,
+            _buildSearchInput(),
+            const SizedBox(height: 20),
+            if (_isLoading) const CircularProgressIndicator(),
+            if (_errorMessage != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Text(
+                  _errorMessage!,
+                  style: const TextStyle(color: Colors.red, fontSize: 16),
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-            if (_isLoading) CircularProgressIndicator(),
-            if (_error != null)
-              Text(_error!, style: TextStyle(color: Colors.red)),
-            if (_result != null) _buildResultWidget(_result!),
+            if (_result != null)
+              Expanded(
+                child: SingleChildScrollView(
+                  child: _buildResultCard(_result!),
+                ),
+              ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildResultWidget(ProductHistoryDetail detail) {
-    return Expanded(
-      child: ListView(
+  Widget _buildSearchInput() {
+    return TextField(
+      controller: _controller,
+      decoration: InputDecoration(
+        labelText: "Enter Order ID",
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        prefixIcon: const Icon(Icons.search),
+        suffixIcon: IconButton(
+          icon: const Icon(Icons.send),
+          onPressed: _searchOrder,
+        ),
+      ),
+      keyboardType: TextInputType.number,
+    );
+  }
+
+  Widget _buildResultCard(ProductHistoryDetail detail) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSection("📦 Order Information", [
+              _buildKeyValue("Order ID", detail.orderId.toString()),
+              _buildKeyValue("Status", detail.status),
+              _buildKeyValue("Created At", detail.createdAt.toString()),
+              _buildKeyValue("Updated At", detail.updatedAt.toString()),
+            ]),
+            const SizedBox(height: 16),
+            _buildSection("👤 User Information", [
+              _buildKeyValue("Full Name", detail.user.fullname),
+              _buildKeyValue("Email", detail.user.email),
+              _buildKeyValue("Phone", detail.user.phone),
+            ]),
+            const SizedBox(height: 16),
+            _buildSection("🔐 Locker Information", [
+              _buildKeyValue("Locker Code", detail.lockerInfo.lockerCode),
+              _buildKeyValue("Locker Status", detail.lockerInfo.status),
+            ]),
+            const SizedBox(height: 16),
+            _buildSection("🎥 Video", [
+              Text(
+                detail.videoPath != null
+                    ? "📹 Video attached (see on detail page)"
+                    : "📹 No video available",
+                style: const TextStyle(fontSize: 16),
+              ),
+            ]),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSection(String title, List<Widget> children) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.blueAccent,
+          ),
+        ),
+        const SizedBox(height: 8),
+        ...children,
+      ],
+    );
+  }
+
+  Widget _buildKeyValue(String key, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '🧾 Order ID: ${detail.orderId}',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            "$key: ",
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
-          Text('📦 Status: ${detail.status}'),
-          Text('📅 Created At: ${detail.createdAt}'),
-          Text('🔄 Updated At: ${detail.updatedAt}'),
-          const SizedBox(height: 12),
-          Text('👤 Fullname: ${detail.user.fullname}'),
-          Text('📧 Email: ${detail.user.email}'),
-          Text('📱 Phone: ${detail.user.phone}'),
-          const SizedBox(height: 12),
-          Text('📦 Locker Code: ${detail.lockerInfo.lockerCode}'),
-          Text('📦 Locker Status: ${detail.lockerInfo.status}'),
-          const SizedBox(height: 12),
-          detail.videoPath != null
-              ? Text('📹 Có video đính kèm (xem ở trang chi tiết)')
-              : Text('📹 Không có video'),
+          Expanded(child: Text(value)),
         ],
       ),
     );

@@ -42,12 +42,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
         StorageService().saveUser(user);
 
-        if (user != null) {
-          emit(LoginSucces());
-        } else {
-          emit(LoginError(error: user.toString()));
-        }
+        emit(LoginSucces(isAdmin: user.isAdmin!));
       } catch (e) {
+        print("error login ${e.toString()}");
         emit(LoginError(error: e.toString()));
       }
     });
@@ -62,7 +59,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           phoneNumber: event.phoneNumber,
           gender: event.gender,
           password: event.password,
-          picture: event.picture,
+          pictures: event.pictures,
         );
 
         bool success = await UserRepository(ApiService()).signUpUser(signup);
