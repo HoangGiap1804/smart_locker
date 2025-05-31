@@ -47,9 +47,7 @@ class _SearchOrderPageState extends State<SearchOrderPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Search Order")),
-      body: Padding(
+    return Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
@@ -72,8 +70,7 @@ class _SearchOrderPageState extends State<SearchOrderPage> {
               ),
           ],
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildSearchInput() {

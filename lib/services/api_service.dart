@@ -36,14 +36,21 @@ class ApiService {
   //   }
   // }
 
-  Future<Response> post(String endpoint, dynamic data) async {
+  Future<Response> post(String endpoint, dynamic data, [String? token]) async {
     try {
-      final response = await _dio.post(endpoint, data: data);
+      final response = await _dio.post(
+        endpoint,
+        data: data,
+        options: Options(
+          headers: token != null ? {'Authorization': 'Bearer $token'} : {},
+        ),
+      );
       return response;
     } on DioException catch (e) {
       throw Exception('POST request failed: ${e.message}');
     }
   }
+
   Future<Response> post1(
     String endpoint,
     Map<String, dynamic> data, [

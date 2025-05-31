@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:smart_locker/models/order.dart';
 import '../services/api_service.dart';
 
@@ -46,5 +49,44 @@ class OrderRepository {
       return false;
     }
     return true;
+  }
+
+  Future<bool?> scanFace(
+    String lockerId,
+    String orderId,
+    XFile image,
+    String accessToken,
+  ) async {
+    Random ran = Random();
+    try {
+
+      final formData = FormData.fromMap({
+        'locker_id': lockerId,
+        'order_id': orderId,
+        'face_image': await MultipartFile.fromFile(
+          image.path,
+          filename: '$ran.jpg',
+        ),
+      });
+      final response = await apiService.post('api/face/recognize/', formData, accessToken);
+
+      if(response.statusCode == 401){
+      return false;
+    }
+      if (response.data is Map) {
+      return response.data["success"];
+    }
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool?> openLocker(String accessToken) async {
+    final response = await apiService.post('api/verify/', accessToken);
+
+    if (response.data is Map && response.data.containsKey('error')) {
+      return response.data["success"];
+    }
+    return false;
   }
 }

@@ -1,30 +1,30 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:smart_locker/module/auth/sign_in/screens/create_account_screen.dart';
+import 'package:camera/camera.dart';
+import 'package:smart_locker/module/home_page/widgets/notification_message.dart';
+import 'package:smart_locker/repositories/order_repository.dart';
+import 'package:smart_locker/services/api_service.dart';
+import 'package:smart_locker/services/storage_service.dart';
 
-@RoutePage()
-class CameraScreen extends StatefulWidget {
-  const CameraScreen({super.key});
+class FaceScan extends StatefulWidget {
+  final String idPackage;
+  final String lockerId;
+  const FaceScan({
+    super.key,
+    required this.idPackage,
+    required this.lockerId,
+  });
 
   @override
-  State<CameraScreen> createState() => _CameraScreenState();
+  State<FaceScan> createState() => _FaceScanState();
 }
 
-class _CameraScreenState extends State<CameraScreen> {
+class _FaceScanState extends State<FaceScan> {
   CameraController? _controller;
   late List<CameraDescription> cameras;
   bool isCameraInitialized = false;
   int index = 0;
   List<XFile> pictures = [];
-  List<String> listTitle = [
-    "Take a front-facing photo",
-    "Take a slightly right-angled photo",
-    "Take a slightly left-angled photo",
-    "Take a photo with a slight downward tilt of the head",
-    "Take a photo with a slight upward tilt of the head",
-    "Finish",
-  ];
+  String title = "Scan Face";
 
   @override
   void initState() {
@@ -99,28 +99,18 @@ class _CameraScreenState extends State<CameraScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        "Step ${index + 1} of 5",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white70,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
                       AnimatedSwitcher(
                         duration: const Duration(milliseconds: 300),
-                        transitionBuilder:
-                            (child, animation) => FadeTransition(
-                              opacity: animation,
-                              child: child,
-                            ),
+                        transitionBuilder: (child, animation) => FadeTransition(
+                          opacity: animation,
+                          child: child,
+                        ),
                         child: Text(
-                          listTitle[index],
+                          title,
                           key: ValueKey(index),
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                            fontSize: 20,
+                            fontSize: 50,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -130,7 +120,7 @@ class _CameraScreenState extends State<CameraScreen> {
                   ),
                 ),
               ),
-            ),
+            )
           ],
         ),
       ),
@@ -141,21 +131,30 @@ class _CameraScreenState extends State<CameraScreen> {
           padding: const EdgeInsets.only(bottom: 20),
           child: FloatingActionButton(
             onPressed: () async {
-              final picture = await _controller!.takePicture();
-              // Gal.putImage(picture.path);
-              pictures.add(picture);
-              setState(() {
-                index++;
-              });
+              try {
+                XFile picture = await _controller!.takePicture();
+                print("📸 Picture taken: ${picture.path}");
 
-              if (index == 5) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder:
-                        (context) => CreateAccountScreen(pictures: pictures),
-                  ),
-                );
+                String? accessToken = await StorageService().getAccessToken();
+                if (accessToken != null) {
+      bool? set = await OrderRepository(ApiService()).scanFace(
+        widget.lockerId,
+        widget.idPackage,
+        picture,
+        accessToken,
+      );
+
+      if (set == null || !set) {
+        NotificationMessage().notify(context, "False");
+      } else {
+        NotificationMessage().notify(context, "Success");
+      }
+              } else {
+              print("⚠️ Access token is null");
+            }
+            } catch (e) {
+                print("❌ Error when taking picture or calling API: $e");
+                NotificationMessage().notify(context, "Error: $e");
               }
             },
             backgroundColor: Colors.white,
@@ -166,4 +165,5 @@ class _CameraScreenState extends State<CameraScreen> {
       ),
     );
   }
+
 }

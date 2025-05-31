@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smart_locker/module/home_page/bloc/home_bloc.dart';
 import 'package:smart_locker/module/home_page/bloc/home_event.dart';
 import 'package:smart_locker/module/home_page/bloc/home_state.dart';
+import 'package:smart_locker/module/home_page/screens/face_scan.dart';
 import 'package:smart_locker/module/home_page/screens/home_page.dart';
 import 'package:smart_locker/module/home_page/screens/search_package_page.dart';
 import 'package:smart_locker/module/profile/profile/screens/profile_screen.dart';
