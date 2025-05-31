@@ -23,6 +23,18 @@ class OrderRepository {
     }
   }
 
+  Future<Order?> searchOrderByID(String idOrder, String accessToken) async {
+    try {
+      final response = await apiService.get(
+        'api/orders/$idOrder/detail',
+        token: accessToken,
+      );
+      return Order.fromJson(response.data);
+    } on DioException {
+      return null;
+    }
+  }
+
   Future<List<Order>?> getListOrder(String accessToken) async {
     try {
       final response = await apiService.get(
@@ -59,7 +71,6 @@ class OrderRepository {
   ) async {
     Random ran = Random();
     try {
-
       final formData = FormData.fromMap({
         'locker_id': lockerId,
         'order_id': orderId,
@@ -68,14 +79,18 @@ class OrderRepository {
           filename: '$ran.jpg',
         ),
       });
-      final response = await apiService.post('api/face/recognize/', formData, accessToken);
+      final response = await apiService.post(
+        'api/face/recognize/',
+        formData,
+        accessToken,
+      );
 
-      if(response.statusCode == 401){
-      return false;
-    }
+      if (response.statusCode == 401) {
+        return false;
+      }
       if (response.data is Map) {
-      return response.data["success"];
-    }
+        return response.data["success"];
+      }
     } catch (e) {
       return false;
     }

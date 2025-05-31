@@ -43,65 +43,71 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: const Color(0xFFFDFDFD),
       body:
-      isLoading
-      ? const Center(child: CircularProgressIndicator())
-      : SafeArea(
-        child: RefreshIndicator(
-          onRefresh: loadOrder,
-          child: ListView(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 16,
-            ),
-            children: [
-              Text(
-                "Your Packages",
-                style: AppTheme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24,
-                ),
-              ),
-              const SizedBox(height: 16),
-              if (listOrder.isEmpty)
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 100),
-                  child: Text(
-                    "No orders available at the moment.",
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[600],
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : SafeArea(
+                child: RefreshIndicator(
+                  onRefresh: loadOrder,
+                  child: ListView(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
                     ),
-                    textAlign: TextAlign.center,
+                    children: [
+                      Text(
+                        "Your Packages",
+                        style: AppTheme.textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      if (listOrder.isEmpty)
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 100),
+                            child: Text(
+                              "No orders available at the moment.",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey[600],
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        )
+                      else
+                        ListView.separated(
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: listOrder.length,
+                          separatorBuilder:
+                              (_, __) => const SizedBox(height: 12),
+                          itemBuilder: (context, index) {
+                            final order = listOrder[index];
+                            return Package(
+                              idOrder: order.orderId,
+                              status: order.status,
+                              timeDelevery: DateTime.parse(order.createAt),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => FaceScan(
+                                          idPackage: order.orderId,
+                                          lockerId: "1",
+                                        ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                    ],
                   ),
                 ),
-              )
-              else
-              ListView.separated(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: listOrder.length,
-                separatorBuilder:
-              (_, __) => const SizedBox(height: 12),
-                itemBuilder: (context, index) {
-                  final order = listOrder[index];
-                  return Package(
-                    idOrder: order.orderId,
-                    status: order.status,
-                    timeDelevery: DateTime.parse(order.createAt),
-                    onTap: (){
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => FaceScan(idPackage: order.orderId, lockerId: "1")),
-                      );
-                    },
-                  );
-                },
               ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

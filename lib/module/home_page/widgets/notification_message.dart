@@ -17,7 +17,16 @@ class NotificationMessage {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.check_circle, color: Colors.green, size: 48),
+                Icon(
+                  (context == "Success")
+                      ? Icons.check_circle
+                      : Icons.error_sharp,
+                  color:
+                      (context == "Success")
+                          ? Colors.greenAccent
+                          : Colors.redAccent,
+                  size: 48,
+                ),
                 SizedBox(height: 12),
                 Text(
                   content,
@@ -28,7 +37,7 @@ class NotificationMessage {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text("Đóng"),
+                  child: Text("Close"),
                 ),
               ],
             ),
