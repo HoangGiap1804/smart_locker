@@ -13,6 +13,7 @@ class UserManagementPage extends StatefulWidget {
 
 class _UserManagementPageState extends State<UserManagementPage> {
   late Future<List<UserActive>> _futureUsers;
+  final TextEditingController controllSearch = TextEditingController();
 
   @override
   void initState() {
@@ -37,12 +38,16 @@ class _UserManagementPageState extends State<UserManagementPage> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Padding(
+        Padding(
           padding: EdgeInsets.all(12),
           child: SearchBar(
+            controller: controllSearch,
             leading: Icon(Icons.search),
             backgroundColor: MaterialStatePropertyAll(Colors.white),
             hintText: 'Search by username...',
+            onChanged: (value) {
+              setState(() {});
+            },
           ),
         ),
         Expanded(
@@ -60,13 +65,24 @@ class _UserManagementPageState extends State<UserManagementPage> {
               if (users.isEmpty) {
                 return const Center(child: Text('No users found.'));
               }
+              List<UserActive> listSearch;
+              (controllSearch.text.isNotEmpty)
+                  ? listSearch =
+                      users
+                          .where(
+                            (user) =>
+                                user.email.contains(controllSearch.text) ||
+                                user.username.contains(controllSearch.text),
+                          )
+                          .toList()
+                  : listSearch = users;
 
               return ListView.separated(
                 padding: const EdgeInsets.all(12),
-                itemCount: users.length,
+                itemCount: listSearch.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 10),
                 itemBuilder: (context, index) {
-                  final user = users[index];
+                  final user = listSearch[index];
 
                   return Slidable(
                     key: ValueKey(user.id),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:smart_locker/models/product_history_detail.dart';
 import 'package:smart_locker/repositories/locker_repository.dart';
 import 'package:smart_locker/services/api_service.dart';
@@ -15,6 +16,7 @@ class _SearchOrderPageState extends State<SearchOrderPage> {
   ProductHistoryDetail? _result;
   bool _isLoading = false;
   String? _errorMessage;
+  final dateFormat = DateFormat('HH:mm dd-MM-yyyy');
 
   Future<void> _searchOrder() async {
     final orderId = _controller.text.trim();
@@ -27,16 +29,13 @@ class _SearchOrderPageState extends State<SearchOrderPage> {
     });
 
     try {
-      final id = int.tryParse(orderId);
-      if (id != null) {
-        final detail = await LockerRepository(ApiService()).fetchProductHistoryDetail(id);
-        if (detail != null) {
-          setState(() => _result = detail);
-        } else {
-          setState(() => _errorMessage = "Order not found.");
-        }
+      final detail = await LockerRepository(
+        ApiService(),
+      ).searchProductHistoryDetail(orderId);
+      if (detail != null) {
+        setState(() => _result = detail);
       } else {
-        setState(() => _errorMessage = "Invalid order ID.");
+        setState(() => _errorMessage = "Order not found.");
       }
     } catch (e) {
       setState(() => _errorMessage = "An error occurred: $e");
@@ -48,29 +47,27 @@ class _SearchOrderPageState extends State<SearchOrderPage> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _buildSearchInput(),
-            const SizedBox(height: 20),
-            if (_isLoading) const CircularProgressIndicator(),
-            if (_errorMessage != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 12),
-                child: Text(
-                  _errorMessage!,
-                  style: const TextStyle(color: Colors.red, fontSize: 16),
-                ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          _buildSearchInput(),
+          const SizedBox(height: 20),
+          if (_isLoading) const CircularProgressIndicator(),
+          if (_errorMessage != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: Text(
+                _errorMessage!,
+                style: const TextStyle(color: Colors.red, fontSize: 16),
               ),
-            if (_result != null)
-              Expanded(
-                child: SingleChildScrollView(
-                  child: _buildResultCard(_result!),
-                ),
-              ),
-          ],
-        ),
-      );
+            ),
+          if (_result != null)
+            Expanded(
+              child: SingleChildScrollView(child: _buildResultCard(_result!)),
+            ),
+        ],
+      ),
+    );
   }
 
   Widget _buildSearchInput() {
@@ -85,7 +82,6 @@ class _SearchOrderPageState extends State<SearchOrderPage> {
           onPressed: _searchOrder,
         ),
       ),
-      keyboardType: TextInputType.number,
     );
   }
 
@@ -101,8 +97,8 @@ class _SearchOrderPageState extends State<SearchOrderPage> {
             _buildSection("📦 Order Information", [
               _buildKeyValue("Order ID", detail.orderId.toString()),
               _buildKeyValue("Status", detail.status),
-              _buildKeyValue("Created At", detail.createdAt.toString()),
-              _buildKeyValue("Updated At", detail.updatedAt.toString()),
+              _buildKeyValue("Created At", dateFormat.format(detail.createdAt)),
+              _buildKeyValue("Updated At", dateFormat.format(detail.updatedAt)),
             ]),
             const SizedBox(height: 16),
             _buildSection("👤 User Information", [
@@ -154,10 +150,7 @@ class _SearchOrderPageState extends State<SearchOrderPage> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "$key: ",
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
+          Text("$key: ", style: const TextStyle(fontWeight: FontWeight.bold)),
           Expanded(child: Text(value)),
         ],
       ),

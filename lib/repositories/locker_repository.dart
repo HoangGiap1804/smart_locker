@@ -59,4 +59,22 @@ class LockerRepository {
     }
     return null;
   }
+
+  Future<ProductHistoryDetail?> searchProductHistoryDetail(
+    String idProduct,
+  ) async {
+    String? accessToken = await StorageService().getAccessToken();
+    if (accessToken != null) {
+      final response = await apiService.get(
+        'api/orders/$idProduct/detail',
+        token: accessToken,
+      );
+      if (response.statusCode == 200) {
+        return ProductHistoryDetail.fromJson(response.data['data']);
+      } else {
+        // throw Exception('Failed to fetch users');
+      }
+    }
+    return null;
+  }
 }
