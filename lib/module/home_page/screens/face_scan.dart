@@ -8,11 +8,7 @@ import 'package:smart_locker/services/storage_service.dart';
 class FaceScan extends StatefulWidget {
   final String idPackage;
   final String lockerId;
-  const FaceScan({
-    super.key,
-    required this.idPackage,
-    required this.lockerId,
-  });
+  const FaceScan({super.key, required this.idPackage, required this.lockerId});
 
   @override
   State<FaceScan> createState() => _FaceScanState();
@@ -101,10 +97,11 @@ class _FaceScanState extends State<FaceScan> {
                     children: [
                       AnimatedSwitcher(
                         duration: const Duration(milliseconds: 300),
-                        transitionBuilder: (child, animation) => FadeTransition(
-                          opacity: animation,
-                          child: child,
-                        ),
+                        transitionBuilder:
+                            (child, animation) => FadeTransition(
+                              opacity: animation,
+                              child: child,
+                            ),
                         child: Text(
                           title,
                           key: ValueKey(index),
@@ -120,7 +117,7 @@ class _FaceScanState extends State<FaceScan> {
                   ),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -137,22 +134,23 @@ class _FaceScanState extends State<FaceScan> {
 
                 String? accessToken = await StorageService().getAccessToken();
                 if (accessToken != null) {
-      bool? set = await OrderRepository(ApiService()).scanFace(
-        widget.lockerId,
-        widget.idPackage,
-        picture,
-        accessToken,
-      );
+                  bool? set = await OrderRepository(ApiService()).scanFace(
+                    widget.lockerId,
+                    widget.idPackage,
+                    picture,
+                    accessToken,
+                  );
 
-      if (set == null || !set) {
-        NotificationMessage().notify(context, "False");
-      } else {
-        NotificationMessage().notify(context, "Success");
-      }
-              } else {
-              print("⚠️ Access token is null");
-            }
-            } catch (e) {
+                  if (set == null || !set) {
+                    NotificationMessage().notify(context, "False");
+                  } else {
+                    NotificationMessage().notify(context, "Success");
+                    Navigator.pop(context);
+                  }
+                } else {
+                  print("⚠️ Access token is null");
+                }
+              } catch (e) {
                 print("❌ Error when taking picture or calling API: $e");
                 NotificationMessage().notify(context, "Error: $e");
               }
@@ -165,5 +163,4 @@ class _FaceScanState extends State<FaceScan> {
       ),
     );
   }
-
 }

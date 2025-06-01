@@ -90,16 +90,18 @@ class _HomePageState extends State<HomePage> {
                               status: order.status,
                               timeDelevery: DateTime.parse(order.createAt),
                               onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder:
-                                        (context) => FaceScan(
-                                          idPackage: order.orderId,
-                                          lockerId: "1",
-                                        ),
-                                  ),
-                                );
+                                if (order.status == "confirmed") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => FaceScan(
+                                            idPackage: order.orderId,
+                                            lockerId: "1",
+                                          ),
+                                    ),
+                                  );
+                                }
                               },
                             );
                           },
