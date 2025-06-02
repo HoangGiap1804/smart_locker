@@ -64,7 +64,6 @@ class OrderRepository {
   }
 
   Future<bool?> scanFace(
-    String lockerId,
     String orderId,
     XFile image,
     String accessToken,
@@ -72,7 +71,6 @@ class OrderRepository {
     Random ran = Random();
     try {
       final formData = FormData.fromMap({
-        'locker_id': lockerId,
         'order_id': orderId,
         'face_image': await MultipartFile.fromFile(
           image.path,

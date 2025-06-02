@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:smart_locker/module/home_page/widgets/notification_message.dart';
 import 'package:smart_locker/repositories/order_repository.dart';
 import 'package:smart_locker/services/api_service.dart';
@@ -7,8 +8,7 @@ import 'package:smart_locker/services/storage_service.dart';
 
 class FaceScan extends StatefulWidget {
   final String idPackage;
-  final String lockerId;
-  const FaceScan({super.key, required this.idPackage, required this.lockerId});
+  const FaceScan({super.key, required this.idPackage});
 
   @override
   State<FaceScan> createState() => _FaceScanState();
@@ -21,6 +21,7 @@ class _FaceScanState extends State<FaceScan> {
   int index = 0;
   List<XFile> pictures = [];
   String title = "Scan Face";
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -118,6 +119,13 @@ class _FaceScanState extends State<FaceScan> {
                 ),
               ),
             ),
+            if (isLoading)
+              Center(
+                child: SpinKitPouringHourGlassRefined(
+                  color: Colors.greenAccent,
+                  size: 50.0,
+                ),
+              ),
           ],
         ),
       ),
@@ -129,13 +137,16 @@ class _FaceScanState extends State<FaceScan> {
           child: FloatingActionButton(
             onPressed: () async {
               try {
+                if (isLoading) return;
+                setState(() {
+                  isLoading = true;
+                });
                 XFile picture = await _controller!.takePicture();
                 print("📸 Picture taken: ${picture.path}");
 
                 String? accessToken = await StorageService().getAccessToken();
                 if (accessToken != null) {
                   bool? set = await OrderRepository(ApiService()).scanFace(
-                    widget.lockerId,
                     widget.idPackage,
                     picture,
                     accessToken,
@@ -147,6 +158,9 @@ class _FaceScanState extends State<FaceScan> {
                     NotificationMessage().notify(context, "Success");
                     Navigator.pop(context);
                   }
+                  setState(() {
+                    isLoading = false;
+                  });
                 } else {
                   print("⚠️ Access token is null");
                 }

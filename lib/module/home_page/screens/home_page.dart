@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:smart_locker/models/order.dart';
 import 'package:smart_locker/models/shared/app_theme.dart';
 import 'package:smart_locker/module/home_page/screens/face_scan.dart';
+import 'package:smart_locker/module/home_page/screens/locker_history_page.dart';
+import 'package:smart_locker/module/home_page/widgets/notification_message.dart';
 import 'package:smart_locker/module/home_page/widgets/package.dart';
+import 'package:smart_locker/repositories/locker_repository.dart';
 import 'package:smart_locker/repositories/order_repository.dart';
 import 'package:smart_locker/services/api_service.dart';
 import 'package:smart_locker/services/storage_service.dart';
@@ -89,18 +92,22 @@ class _HomePageState extends State<HomePage> {
                               idOrder: order.orderId,
                               status: order.status,
                               timeDelevery: DateTime.parse(order.createAt),
-                              onTap: () {
-                                if (order.status == "confirmed") {
+                              onTap: () async{
+                                bool verify = await LockerRepository(ApiService()).getVerify();
+                                if (!mounted) return;
+                                if (order.status == "confirmed" && verify) {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder:
                                           (context) => FaceScan(
                                             idPackage: order.orderId,
-                                            lockerId: "1",
                                           ),
                                     ),
                                   );
+                                }
+                                else{
+                                  NotificationMessage().notify(context, "False");
                                 }
                               },
                             );

@@ -77,4 +77,21 @@ class LockerRepository {
     }
     return null;
   }
+
+  Future<bool> getVerify() async {
+    String? accessToken = await StorageService().getAccessToken();
+    try {
+    if (accessToken != null) {
+      final response = await apiService.get('api/verify', token: accessToken);
+      if (response.statusCode == 200) {
+        return response.data['status'] == 'success';
+      } else {
+        // throw Exception('Failed to fetch users');
+        return false;
+      }
+    }
+    } catch (e) {
+    }
+    return false;
+  }
 }
