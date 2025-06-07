@@ -146,17 +146,17 @@ class _FaceScanState extends State<FaceScan> {
 
                 String? accessToken = await StorageService().getAccessToken();
                 if (accessToken != null) {
-                  bool? set = await OrderRepository(ApiService()).scanFace(
-                    widget.idPackage,
-                    picture,
-                    accessToken,
-                  );
+                  bool? set = await OrderRepository(
+                    ApiService(),
+                  ).scanFace(widget.idPackage, picture, accessToken);
 
                   if (set == null || !set) {
                     NotificationMessage().notify(context, "False");
                   } else {
                     NotificationMessage().notify(context, "Success");
-                    Navigator.pop(context);
+                    Future.delayed(Duration(milliseconds: 200), () {
+                      Navigator.pop(context);
+                    });
                   }
                   setState(() {
                     isLoading = false;

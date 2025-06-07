@@ -92,10 +92,14 @@ class _HomePageState extends State<HomePage> {
                               idOrder: order.orderId,
                               status: order.status,
                               timeDelevery: DateTime.parse(order.createAt),
-                              onTap: () async{
-                                bool verify = await LockerRepository(ApiService()).getVerify();
+                              onTap: () async {
+                                if (order.status != "confirmed") return;
+                                bool verify =
+                                    await LockerRepository(
+                                      ApiService(),
+                                    ).getVerify();
                                 if (!mounted) return;
-                                if (order.status == "confirmed" && verify) {
+                                if (verify) {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -105,9 +109,11 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                     ),
                                   );
-                                }
-                                else{
-                                  NotificationMessage().notify(context, "False");
+                                } else {
+                                  NotificationMessage().notify(
+                                    context,
+                                    "False",
+                                  );
                                 }
                               },
                             );
