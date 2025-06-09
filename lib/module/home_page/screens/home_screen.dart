@@ -40,12 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               centerTitle: true,
-              leading: IconButton(
-                icon: const Icon(Icons.menu, color: Colors.black87),
-                onPressed: () {
-                  // Handle menu action
-                },
-              ),
               actions: [
                 GestureDetector(
                   onTap: () {

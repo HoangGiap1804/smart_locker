@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:smart_locker/models/product_history_detail.dart';
 import 'package:smart_locker/repositories/locker_repository.dart';
 import 'package:smart_locker/services/api_service.dart';
+import 'package:better_player/better_player.dart';
 
 class SearchOrderPage extends StatefulWidget {
   const SearchOrderPage({super.key});
@@ -13,6 +14,7 @@ class SearchOrderPage extends StatefulWidget {
 
 class _SearchOrderPageState extends State<SearchOrderPage> {
   final TextEditingController _controller = TextEditingController();
+  BetterPlayerController? _betterPlayerController;
   ProductHistoryDetail? _result;
   bool _isLoading = false;
   String? _errorMessage;
@@ -33,7 +35,26 @@ class _SearchOrderPageState extends State<SearchOrderPage> {
         ApiService(),
       ).searchProductHistoryDetail(orderId);
       if (detail != null) {
-        setState(() => _result = detail);
+        setState(() {
+          _result = detail;
+
+          if (_result!.videoPath != null && _result!.videoPath!.isNotEmpty) {
+            _betterPlayerController = BetterPlayerController(
+              const BetterPlayerConfiguration(
+                autoPlay: false,
+                looping: false,
+                controlsConfiguration: BetterPlayerControlsConfiguration(
+                  enableSkips: false,
+                  enableOverflowMenu: false,
+                ),
+              ),
+              betterPlayerDataSource: BetterPlayerDataSource(
+                BetterPlayerDataSourceType.network,
+                _result!.videoPath!,
+              ),
+            );
+          }
+        });
       } else {
         setState(() => _errorMessage = "Order not found.");
       }
@@ -42,6 +63,13 @@ class _SearchOrderPageState extends State<SearchOrderPage> {
     } finally {
       setState(() => _isLoading = false);
     }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _betterPlayerController?.dispose();
+    super.dispose();
   }
 
   @override
@@ -85,41 +113,76 @@ class _SearchOrderPageState extends State<SearchOrderPage> {
     );
   }
 
-  Widget _buildResultCard(ProductHistoryDetail detail) {
+  String formatDateTime(DateTime dt) {
+    return DateFormat('dd/MM/yyyy HH:mm').format(dt.toLocal());
+  }
+
+  Widget _buildResultCard(ProductHistoryDetail _detail) {
+    return Column(
+      children: [
+        buildInfoCard(
+          title: '🧾 Order Info',
+          children: [
+            Text('Order ID: ${_detail.orderId}'),
+            Text('Status: ${_detail.status}'),
+            Text('Deliver: ${formatDateTime(_detail.createdAt)}'),
+            Text('Receive: ${formatDateTime(_detail.updatedAt)}'),
+          ],
+        ),
+        buildInfoCard(
+          title: '👤 User Info',
+          children: [
+            Text('Name: ${_detail.user.fullname}'),
+            Text('Email: ${_detail.user.email}'),
+            Text('Phone: ${_detail.user.phone}'),
+            Text('Gender: ${_detail.user.gender}'),
+          ],
+        ),
+        buildInfoCard(
+          title: '📦 Locker Info',
+          children: [
+            Text('Code: ${_detail.lockerInfo.lockerCode}'),
+            Text('Status: ${_detail.lockerInfo.status}'),
+          ],
+        ),
+        if (_betterPlayerController != null)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                '📹 Video',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              AspectRatio(
+                aspectRatio: 16 / 9,
+                child: BetterPlayer(controller: _betterPlayerController!),
+              ),
+            ],
+          )
+        else
+          const Text('❌ No video available.'),
+      ],
+    );
+  }
+
+  Widget buildInfoCard({
+    required String title,
+    required List<Widget> children,
+  }) {
     return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      margin: const EdgeInsets.only(bottom: 16),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(12.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSection("📦 Order Information", [
-              _buildKeyValue("Order ID", detail.orderId.toString()),
-              _buildKeyValue("Status", detail.status),
-              _buildKeyValue("Created At", dateFormat.format(detail.createdAt)),
-              _buildKeyValue("Updated At", dateFormat.format(detail.updatedAt)),
-            ]),
-            const SizedBox(height: 16),
-            _buildSection("👤 User Information", [
-              _buildKeyValue("Full Name", detail.user.fullname),
-              _buildKeyValue("Email", detail.user.email),
-              _buildKeyValue("Phone", detail.user.phone),
-            ]),
-            const SizedBox(height: 16),
-            _buildSection("🔐 Locker Information", [
-              _buildKeyValue("Locker Code", detail.lockerInfo.lockerCode),
-              _buildKeyValue("Locker Status", detail.lockerInfo.status),
-            ]),
-            const SizedBox(height: 16),
-            _buildSection("🎥 Video", [
-              Text(
-                detail.videoPath != null
-                    ? "📹 Video attached (see on detail page)"
-                    : "📹 No video available",
-                style: const TextStyle(fontSize: 16),
-              ),
-            ]),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const Divider(),
+            ...children,
           ],
         ),
       ),

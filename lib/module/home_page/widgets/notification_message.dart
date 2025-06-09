@@ -1,6 +1,49 @@
 import 'package:flutter/material.dart';
 
 class NotificationMessage {
+  void showConfirmDialog(
+    BuildContext context,
+    String title,
+    String content,
+    VoidCallback onPressCancel,
+    VoidCallback onPressOK,
+  ) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+            content: Text(content),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Đóng dialog
+                  onPressCancel(); // Gọi callback cancel
+                },
+                child: Text('Cancel', style: TextStyle(color: Colors.black)),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Đóng dialog
+                  onPressOK(); // Gọi callback OK
+                },
+                child: Text('OK'),
+              ),
+            ],
+          ),
+    );
+  }
+
   void notify(BuildContext context, String content) {
     showDialog(
       context: context,

@@ -93,10 +93,10 @@ class _LockerHistoryPageState extends State<LockerHistoryPage> {
                                 ),
                                 const SizedBox(height: 6),
                                 Text(
-                                  'Created: ${formatDateTime(history.createdAt)}',
+                                  'Deliver: ${formatDateTime(history.createdAt)}',
                                 ),
                                 Text(
-                                  'Updated: ${formatDateTime(history.updatedAt)}',
+                                  'Receive: ${formatDateTime(history.updatedAt)}',
                                 ),
                               ],
                             ),

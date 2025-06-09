@@ -80,22 +80,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ? Center(child: CircularProgressIndicator())
                 : _bodySection(context),
 
-            ProfileButton(
-              onTab: () {
-                // AuthenticationRepository().signOut();
-                // context.router.replace(LoginRoute());
-
-                StorageService().clearStorage();
-                StorageService().saveTokens("", "");
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()),
-                  (Route<dynamic> route) => false,
-                );
-              },
-              text: "Logout",
-            ),
-            SizedBox(height: 50),
           ],
         ),
       ),
@@ -161,6 +145,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
               header: "Gender",
               hintText: "Gender",
               textEditingController: gender,
+            ),
+            SizedBox(height: 50),
+
+            ProfileButton(
+              onTab: () {
+                // AuthenticationRepository().signOut();
+                // context.router.replace(LoginRoute());
+
+                StorageService().clearStorage();
+                StorageService().saveTokens("", "");
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                  (Route<dynamic> route) => false,
+                );
+              },
+              text: "Logout",
             ),
             SizedBox(height: 50),
           ],

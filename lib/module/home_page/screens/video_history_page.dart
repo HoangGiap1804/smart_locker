@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:smart_locker/models/product_history_detail.dart';
 import 'package:smart_locker/repositories/locker_repository.dart';
 import 'package:smart_locker/services/api_service.dart';
-import 'package:video_player/video_player.dart';
 import 'package:intl/intl.dart';
+import 'package:better_player/better_player.dart';
 
 class VideoHistoryPage extends StatefulWidget {
   final int productId;
@@ -15,9 +15,8 @@ class VideoHistoryPage extends StatefulWidget {
 }
 
 class _VideoHistoryPageState extends State<VideoHistoryPage> {
-  VideoPlayerController? _controller;
-  Future<void>? _initializeVideoPlayerFuture;
   ProductHistoryDetail? _detail;
+  BetterPlayerController? _betterPlayerController;
 
   @override
   void initState() {
@@ -29,24 +28,39 @@ class _VideoHistoryPageState extends State<VideoHistoryPage> {
     final detail = await LockerRepository(
       ApiService(),
     ).fetchProductHistoryDetail(widget.productId);
+    if (!mounted) return;
+
     if (detail != null) {
       setState(() {
         _detail = detail;
       });
 
-      // if (detail.videoUrl != null && detail.videoUrl!.isNotEmpty) {
-      //   _controller = VideoPlayerController.network(detail.videoUrl!);
-      //   _initializeVideoPlayerFuture = _controller!.initialize().then((_) {
-      //     setState(() {});
-      //     _controller!.play();
-      //   });
-      // }
+      if (detail.videoPath != null && detail.videoPath!.isNotEmpty) {
+        BetterPlayerDataSource dataSource = BetterPlayerDataSource(
+          BetterPlayerDataSourceType.network,
+          detail.videoPath!,
+        );
+
+        _betterPlayerController = BetterPlayerController(
+          const BetterPlayerConfiguration(
+            autoPlay: true,
+            looping: false,
+            controlsConfiguration: BetterPlayerControlsConfiguration(
+              enableSkips: false,
+              enableFullscreen: true,
+              enablePlaybackSpeed: true,
+              enableMute: true,
+            ),
+          ),
+          betterPlayerDataSource: dataSource,
+        );
+      }
     }
   }
 
   @override
   void dispose() {
-    _controller?.dispose();
+    _betterPlayerController?.dispose();
     super.dispose();
   }
 
@@ -94,8 +108,8 @@ class _VideoHistoryPageState extends State<VideoHistoryPage> {
               children: [
                 Text('Order ID: ${_detail!.orderId}'),
                 Text('Status: ${_detail!.status}'),
-                Text('Created At: ${formatDateTime(_detail!.createdAt)}'),
-                Text('Updated At: ${formatDateTime(_detail!.updatedAt)}'),
+                Text('Deliver: ${formatDateTime(_detail!.createdAt)}'),
+                Text('Receive: ${formatDateTime(_detail!.updatedAt)}'),
               ],
             ),
             buildInfoCard(
@@ -114,7 +128,8 @@ class _VideoHistoryPageState extends State<VideoHistoryPage> {
                 Text('Status: ${_detail!.lockerInfo.status}'),
               ],
             ),
-            if (_controller != null && _initializeVideoPlayerFuture != null)
+            const SizedBox(height: 10),
+            if (_betterPlayerController != null)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -123,37 +138,9 @@ class _VideoHistoryPageState extends State<VideoHistoryPage> {
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
-                  FutureBuilder(
-                    future: _initializeVideoPlayerFuture,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        return Column(
-                          children: [
-                            AspectRatio(
-                              aspectRatio: _controller!.value.aspectRatio,
-                              child: VideoPlayer(_controller!),
-                            ),
-                            const SizedBox(height: 10),
-                            FloatingActionButton(
-                              onPressed: () {
-                                setState(() {
-                                  _controller!.value.isPlaying
-                                      ? _controller!.pause()
-                                      : _controller!.play();
-                                });
-                              },
-                              child: Icon(
-                                _controller!.value.isPlaying
-                                    ? Icons.pause
-                                    : Icons.play_arrow,
-                              ),
-                            ),
-                          ],
-                        );
-                      } else {
-                        return const CircularProgressIndicator();
-                      }
-                    },
+                  AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: BetterPlayer(controller: _betterPlayerController!),
                   ),
                 ],
               )
