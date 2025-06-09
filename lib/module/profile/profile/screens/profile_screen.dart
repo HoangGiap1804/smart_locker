@@ -87,9 +87,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 StorageService().clearStorage();
                 StorageService().saveTokens("", "");
-                Navigator.pushReplacement(
+                Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => LoginScreen()),
+                  (Route<dynamic> route) => false,
                 );
               },
               text: "Logout",

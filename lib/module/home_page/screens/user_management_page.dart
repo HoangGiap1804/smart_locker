@@ -84,42 +84,29 @@ class _UserManagementPageState extends State<UserManagementPage> {
                 itemBuilder: (context, index) {
                   final user = listSearch[index];
 
-                  return Slidable(
-                    key: ValueKey(user.id),
-                    endActionPane: ActionPane(
-                      motion: const DrawerMotion(),
-                      children: [
-                        SlidableAction(
-                          onPressed: (_) => _toggleUserStatus(user),
-                          backgroundColor:
-                              user.isActive
-                                  ? Colors.redAccent
-                                  : Colors.greenAccent,
-                          foregroundColor: Colors.white,
-                          icon: user.isActive ? Icons.lock : Icons.lock_open,
-                          label: user.isActive ? 'Deactivate' : 'Activate',
-                        ),
-                      ],
+                  return Card(
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Card(
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor:
+                            user.isActive
+                                ? Colors.greenAccent
+                                : Colors.redAccent,
+                        child: const Icon(Icons.person, color: Colors.white),
                       ),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor:
-                              user.isActive
-                                  ? Colors.greenAccent
-                                  : Colors.redAccent,
-                          child: const Icon(Icons.person, color: Colors.white),
-                        ),
-                        title: Text(
-                          user.username,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Text(user.email),
-                        trailing: Chip(
+                      title: Text(
+                        user.username,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(user.email),
+                      trailing: InkWell(
+                        onTap: () {
+                          _toggleUserStatus(user);
+                        },
+                        child: Chip(
                           label: Text(user.isActive ? 'Active' : 'Inactive'),
                           backgroundColor:
                               user.isActive

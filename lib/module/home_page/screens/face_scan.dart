@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:smart_locker/module/home_page/screens/home_page.dart';
+import 'package:smart_locker/module/home_page/screens/home_screen.dart';
 import 'package:smart_locker/module/home_page/widgets/notification_message.dart';
 import 'package:smart_locker/repositories/order_repository.dart';
 import 'package:smart_locker/services/api_service.dart';
@@ -152,15 +154,18 @@ class _FaceScanState extends State<FaceScan> {
 
                   if (set == null || !set) {
                     NotificationMessage().notify(context, "False");
+                    setState(() {
+                      isLoading = false;
+                    });
                   } else {
                     NotificationMessage().notify(context, "Success");
                     Future.delayed(Duration(milliseconds: 200), () {
-                      Navigator.pop(context);
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => HomeScreen()),
+                      );
                     });
                   }
-                  setState(() {
-                    isLoading = false;
-                  });
                 } else {
                   print("⚠️ Access token is null");
                 }

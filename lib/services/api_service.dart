@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 
 class ApiService {
-  final Dio _dio = Dio(BaseOptions(baseUrl: 'http://192.168.1.53:8000/'));
+  final Dio _dio = Dio(BaseOptions(baseUrl: 'http://10.10.67.109:8000/'));
 
   // Hàm GET
   Future<Response> get(

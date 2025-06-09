@@ -18,11 +18,11 @@ class NotificationMessage {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  (context == "Success")
+                  (content == "Success")
                       ? Icons.check_circle
                       : Icons.error_sharp,
                   color:
-                      (context == "Success")
+                      (content == "Success")
                           ? Colors.greenAccent
                           : Colors.redAccent,
                   size: 48,
