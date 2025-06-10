@@ -3,7 +3,8 @@ import 'package:intl/intl.dart';
 import 'package:smart_locker/models/product_history_detail.dart';
 import 'package:smart_locker/repositories/locker_repository.dart';
 import 'package:smart_locker/services/api_service.dart';
-import 'package:better_player/better_player.dart';
+import 'package:video_player/video_player.dart';
+import 'package:chewie/chewie.dart';
 
 class SearchOrderPage extends StatefulWidget {
   const SearchOrderPage({super.key});
@@ -14,11 +15,13 @@ class SearchOrderPage extends StatefulWidget {
 
 class _SearchOrderPageState extends State<SearchOrderPage> {
   final TextEditingController _controller = TextEditingController();
-  BetterPlayerController? _betterPlayerController;
   ProductHistoryDetail? _result;
   bool _isLoading = false;
   String? _errorMessage;
   final dateFormat = DateFormat('HH:mm dd-MM-yyyy');
+
+  VideoPlayerController? _videoPlayerController;
+  ChewieController? _chewieController;
 
   Future<void> _searchOrder() async {
     final orderId = _controller.text.trim();
@@ -37,24 +40,27 @@ class _SearchOrderPageState extends State<SearchOrderPage> {
       if (detail != null) {
         setState(() {
           _result = detail;
-
-          if (_result!.videoPath != null && _result!.videoPath!.isNotEmpty) {
-            _betterPlayerController = BetterPlayerController(
-              const BetterPlayerConfiguration(
-                autoPlay: false,
-                looping: false,
-                controlsConfiguration: BetterPlayerControlsConfiguration(
-                  enableSkips: false,
-                  enableOverflowMenu: false,
-                ),
-              ),
-              betterPlayerDataSource: BetterPlayerDataSource(
-                BetterPlayerDataSourceType.network,
-                _result!.videoPath!,
-              ),
-            );
-          }
         });
+
+        if (detail.videoPath != null && detail.videoPath!.isNotEmpty) {
+          _videoPlayerController?.dispose();
+          _chewieController?.dispose();
+
+          _videoPlayerController = VideoPlayerController.network(
+            detail.videoPath!,
+          );
+          await _videoPlayerController!.initialize();
+
+          _chewieController = ChewieController(
+            videoPlayerController: _videoPlayerController!,
+            autoPlay: false,
+            looping: false,
+            allowMuting: true,
+            allowPlaybackSpeedChanging: true,
+          );
+
+          setState(() {});
+        }
       } else {
         setState(() => _errorMessage = "Order not found.");
       }
@@ -68,7 +74,8 @@ class _SearchOrderPageState extends State<SearchOrderPage> {
   @override
   void dispose() {
     _controller.dispose();
-    _betterPlayerController?.dispose();
+    _videoPlayerController?.dispose();
+    _chewieController?.dispose();
     super.dispose();
   }
 
@@ -145,7 +152,8 @@ class _SearchOrderPageState extends State<SearchOrderPage> {
             Text('Status: ${_detail.lockerInfo.status}'),
           ],
         ),
-        if (_betterPlayerController != null)
+        if (_chewieController != null &&
+            _chewieController!.videoPlayerController.value.isInitialized)
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -155,8 +163,8 @@ class _SearchOrderPageState extends State<SearchOrderPage> {
               ),
               const SizedBox(height: 10),
               AspectRatio(
-                aspectRatio: 16 / 9,
-                child: BetterPlayer(controller: _betterPlayerController!),
+                aspectRatio: _videoPlayerController!.value.aspectRatio,
+                child: Chewie(controller: _chewieController!),
               ),
             ],
           )
@@ -185,37 +193,6 @@ class _SearchOrderPageState extends State<SearchOrderPage> {
             ...children,
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildSection(String title, List<Widget> children) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.blueAccent,
-          ),
-        ),
-        const SizedBox(height: 8),
-        ...children,
-      ],
-    );
-  }
-
-  Widget _buildKeyValue(String key, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("$key: ", style: const TextStyle(fontWeight: FontWeight.bold)),
-          Expanded(child: Text(value)),
-        ],
       ),
     );
   }

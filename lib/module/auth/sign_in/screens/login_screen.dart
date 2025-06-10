@@ -25,11 +25,11 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailEditingController = TextEditingController(
-    text: "hanhpro",
+    text: "giapwibu",
   );
 
   final TextEditingController passwordEditingController = TextEditingController(
-    text: "hanh1552004",
+    text: "123456",
   );
 
   @override
@@ -113,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
               if (state is AuthError) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(state.error),
+                    content: Text("Incorrect username or password."),
                     backgroundColor: Colors.red,
                   ),
                 );

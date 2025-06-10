@@ -3,7 +3,8 @@ import 'package:smart_locker/models/product_history_detail.dart';
 import 'package:smart_locker/repositories/locker_repository.dart';
 import 'package:smart_locker/services/api_service.dart';
 import 'package:intl/intl.dart';
-import 'package:better_player/better_player.dart';
+import 'package:video_player/video_player.dart';
+import 'package:chewie/chewie.dart';
 
 class VideoHistoryPage extends StatefulWidget {
   final int productId;
@@ -16,8 +17,10 @@ class VideoHistoryPage extends StatefulWidget {
 
 class _VideoHistoryPageState extends State<VideoHistoryPage> {
   ProductHistoryDetail? _detail;
-  BetterPlayerController? _betterPlayerController;
-
+  VideoPlayerController? _videoPlayerController;
+  ChewieController? _chewieController;
+  bool isLoadingVideo = true;
+  bool isLoadingFalse = false;
   @override
   void initState() {
     super.initState();
@@ -34,33 +37,37 @@ class _VideoHistoryPageState extends State<VideoHistoryPage> {
       setState(() {
         _detail = detail;
       });
-
-      if (detail.videoPath != null && detail.videoPath!.isNotEmpty) {
-        BetterPlayerDataSource dataSource = BetterPlayerDataSource(
-          BetterPlayerDataSourceType.network,
-          detail.videoPath!,
+      try {
+        print("duong dan video ${detail.videoPath}");
+        _videoPlayerController = VideoPlayerController.network(
+          "http://192.168.1.53:8000/media/videos/L3_b9e7ee7e.mp4",
         );
+        await _videoPlayerController!.initialize();
 
-        _betterPlayerController = BetterPlayerController(
-          const BetterPlayerConfiguration(
-            autoPlay: true,
-            looping: false,
-            controlsConfiguration: BetterPlayerControlsConfiguration(
-              enableSkips: false,
-              enableFullscreen: true,
-              enablePlaybackSpeed: true,
-              enableMute: true,
-            ),
-          ),
-          betterPlayerDataSource: dataSource,
+        _chewieController = ChewieController(
+          videoPlayerController: _videoPlayerController!,
+          autoPlay: true,
+          looping: false,
+          allowMuting: true,
+          allowPlaybackSpeedChanging: true,
         );
+      } catch (e) {
+        setState(() {
+          isLoadingFalse = true;
+        });
       }
+
+      setState(() {
+        isLoadingVideo = false;
+      });
     }
   }
 
   @override
   void dispose() {
-    _betterPlayerController?.dispose();
+    _videoPlayerController?.dispose();
+    _chewieController?.dispose();
+
     super.dispose();
   }
 
@@ -129,23 +136,27 @@ class _VideoHistoryPageState extends State<VideoHistoryPage> {
               ],
             ),
             const SizedBox(height: 10),
-            if (_betterPlayerController != null)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    '📹 Video',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  AspectRatio(
-                    aspectRatio: 16 / 9,
-                    child: BetterPlayer(controller: _betterPlayerController!),
-                  ),
-                ],
-              )
-            else
-              const Text('❌ No video available.'),
+            isLoadingVideo
+                ? Center(child: CircularProgressIndicator())
+                : (!isLoadingFalse)
+                ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      '📹 Video',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    AspectRatio(
+                      aspectRatio: 16 / 9,
+                      child: Chewie(controller: _chewieController!),
+                    ),
+                  ],
+                )
+                : const Text('❌ No video available.'),
           ],
         ),
       ),

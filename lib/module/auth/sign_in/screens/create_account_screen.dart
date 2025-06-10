@@ -25,7 +25,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     text: "hgiap89@gmail.com",
   );
   final TextEditingController _userName = TextEditingController(
-    text: "giapwibu",
+    text: "giapwibu1",
   );
   final TextEditingController _fullName = TextEditingController(
     text: "Nguyen Van Hoang Giap",
@@ -85,7 +85,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     return Align(
       alignment: Alignment.centerLeft,
       child: Text(
-        "Create an\npassword?",
+        "Create an\naccount?",
         style: AppTheme.textTheme.headlineLarge,
       ),
     );
@@ -261,8 +261,11 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
             ),
             GestureDetector(
               onTap: () {
-                // context.router.back();
-                Navigator.pop(context);
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                  (Route<dynamic> route) => false,
+                );
               },
               child: Text(" Login", style: AppTheme.textInk.bodyLarge),
             ),

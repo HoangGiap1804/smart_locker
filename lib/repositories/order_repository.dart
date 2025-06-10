@@ -94,6 +94,26 @@ class OrderRepository {
     }
   }
 
+  Future<bool?> scanFaceLocker(String orderId, String accessToken) async {
+    try {
+      final formData = FormData.fromMap({'order_id': orderId});
+      final response = await apiService.post(
+        'api/face/recognize-at-locker/',
+        formData,
+        accessToken,
+      );
+
+      if (response.statusCode == 401) {
+        return false;
+      }
+      if (response.data is Map) {
+        return response.data["success"];
+      }
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<bool?> openLocker(String accessToken) async {
     final response = await apiService.post('api/verify/', accessToken);
 
