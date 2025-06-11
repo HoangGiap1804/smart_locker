@@ -23,6 +23,9 @@ class _SearchOrderPageState extends State<SearchOrderPage> {
   VideoPlayerController? _videoPlayerController;
   ChewieController? _chewieController;
 
+  bool isLoadingVideo = true;
+  bool isLoadingFalse = false;
+
   Future<void> _searchOrder() async {
     final orderId = _controller.text.trim();
     if (orderId.isEmpty) return;
@@ -37,32 +40,35 @@ class _SearchOrderPageState extends State<SearchOrderPage> {
       final detail = await LockerRepository(
         ApiService(),
       ).searchProductHistoryDetail(orderId);
+      if (!mounted) return;
+
       if (detail != null) {
         setState(() {
           _result = detail;
         });
-
-        if (detail.videoPath != null && detail.videoPath!.isNotEmpty) {
-          _videoPlayerController?.dispose();
-          _chewieController?.dispose();
-
+        try {
+          print("duong dan video ${detail.videoPath}");
           _videoPlayerController = VideoPlayerController.network(
-            detail.videoPath!,
+            "http://192.168.1.53:8000${_result!.videoPath}",
           );
           await _videoPlayerController!.initialize();
 
           _chewieController = ChewieController(
             videoPlayerController: _videoPlayerController!,
-            autoPlay: false,
+            autoPlay: true,
             looping: false,
             allowMuting: true,
             allowPlaybackSpeedChanging: true,
           );
-
-          setState(() {});
+        } catch (e) {
+          setState(() {
+            isLoadingFalse = true;
+          });
         }
-      } else {
-        setState(() => _errorMessage = "Order not found.");
+
+        setState(() {
+          isLoadingVideo = false;
+        });
       }
     } catch (e) {
       setState(() => _errorMessage = "An error occurred: $e");
@@ -85,6 +91,19 @@ class _SearchOrderPageState extends State<SearchOrderPage> {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: Text(
+              "Search order by ID",
+              style: TextStyle(
+                fontSize: 24, // To
+                fontWeight: FontWeight.bold, // Đậm
+                color: Colors.black87, // Màu dễ nhìn
+                letterSpacing: 1.2, // Giãn chữ nhẹ
+              ),
+              textAlign: TextAlign.center, // Căn giữa nếu muốn
+            ),
+          ),
           _buildSearchInput(),
           const SizedBox(height: 20),
           if (_isLoading) const CircularProgressIndicator(),
@@ -152,24 +171,24 @@ class _SearchOrderPageState extends State<SearchOrderPage> {
             Text('Status: ${_detail.lockerInfo.status}'),
           ],
         ),
-        if (_chewieController != null &&
-            _chewieController!.videoPlayerController.value.isInitialized)
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                '📹 Video',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              AspectRatio(
-                aspectRatio: _videoPlayerController!.value.aspectRatio,
-                child: Chewie(controller: _chewieController!),
-              ),
-            ],
-          )
-        else
-          const Text('❌ No video available.'),
+        isLoadingVideo
+            ? Center(child: CircularProgressIndicator())
+            : (!isLoadingFalse)
+            ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '📹 Video',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: Chewie(controller: _chewieController!),
+                ),
+              ],
+            )
+            : const Text('❌ No video available.'),
       ],
     );
   }

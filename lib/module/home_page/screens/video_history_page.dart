@@ -40,7 +40,7 @@ class _VideoHistoryPageState extends State<VideoHistoryPage> {
       try {
         print("duong dan video ${detail.videoPath}");
         _videoPlayerController = VideoPlayerController.network(
-          "http://192.168.1.53:8000/media/videos/L3_b9e7ee7e.mp4",
+          "http://192.168.1.53:8000${_detail!.videoPath}",
         );
         await _videoPlayerController!.initialize();
 

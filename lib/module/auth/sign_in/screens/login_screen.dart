@@ -25,11 +25,11 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailEditingController = TextEditingController(
-    text: "giapwibu",
+    text: "",
   );
 
   final TextEditingController passwordEditingController = TextEditingController(
-    text: "123456",
+    text: "",
   );
 
   @override
@@ -127,14 +127,16 @@ class _LoginScreenState extends State<LoginScreen> {
                 );
                 // context.router.replace(HomeRoute());
                 if (state.isAdmin) {
-                  Navigator.pushReplacement(
+                  Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(builder: (context) => AdminScreen()),
+                    (Route<dynamic> route) => false,
                   );
                 } else {
-                  Navigator.pushReplacement(
+                  Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(builder: (context) => HomeScreen()),
+                    (Route<dynamic> route) => false,
                   );
                 }
               }

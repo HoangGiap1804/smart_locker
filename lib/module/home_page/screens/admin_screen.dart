@@ -6,6 +6,7 @@ import 'package:smart_locker/module/home_page/bloc/home_state.dart';
 import 'package:smart_locker/module/home_page/screens/locker_management_page.dart';
 import 'package:smart_locker/module/home_page/screens/search_order_page.dart';
 import 'package:smart_locker/module/home_page/screens/user_management_page.dart';
+import 'package:smart_locker/module/profile/profile/screens/profile_admin.dart';
 import 'package:smart_locker/module/profile/profile/screens/profile_screen.dart';
 
 class AdminScreen extends StatefulWidget {
@@ -25,6 +26,8 @@ class _AdminScreenState extends State<AdminScreen> {
         appBar: AppBar(
           backgroundColor: Colors.white,
           surfaceTintColor: Colors.white,
+          title: Text("Admin"),
+          centerTitle: true,
           actions: [
             GestureDetector(
               onTap: () {
@@ -32,7 +35,7 @@ class _AdminScreenState extends State<AdminScreen> {
 
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ProfileScreen()),
+                  MaterialPageRoute(builder: (context) => ProfileAdmin()),
                 );
               },
               child: Container(
@@ -52,7 +55,7 @@ class _AdminScreenState extends State<AdminScreen> {
                 children: [
                   UserManagementPage(),
                   LockerManagementPage(),
-                  SearchOrderPage()
+                  SearchOrderPage(),
                   // VideoHistoryPage(),
                 ],
               );
@@ -85,6 +88,5 @@ class _AdminScreenState extends State<AdminScreen> {
         ),
       ),
     );
-
   }
 }

@@ -11,6 +11,8 @@ UserActive _$UserActiveFromJson(Map<String, dynamic> json) => UserActive(
       username: json['username'] as String,
       email: json['email'] as String,
       isActive: json['is_active'] as bool,
+      fullName: json['full_name'] as String,
+      phone: json['phone'] as String,
     );
 
 Map<String, dynamic> _$UserActiveToJson(UserActive instance) =>
@@ -18,5 +20,7 @@ Map<String, dynamic> _$UserActiveToJson(UserActive instance) =>
       'id': instance.id,
       'username': instance.username,
       'email': instance.email,
+      'full_name': instance.fullName,
+      'phone': instance.phone,
       'is_active': instance.isActive,
     };

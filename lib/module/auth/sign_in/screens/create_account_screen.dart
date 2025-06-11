@@ -21,31 +21,31 @@ class CreateAccountScreen extends StatefulWidget {
 }
 
 class _CreateAccountScreenState extends State<CreateAccountScreen> {
-  final TextEditingController _email = TextEditingController(
-    text: "hgiap89@gmail.com",
-  );
-  final TextEditingController _userName = TextEditingController(
-    text: "giapwibu1",
-  );
-  final TextEditingController _fullName = TextEditingController(
-    text: "Nguyen Van Hoang Giap",
-  );
-  final TextEditingController _phoneNumber = TextEditingController(
-    text: "0129876543",
-  );
-  final TextEditingController _password = TextEditingController(text: "123456");
-  final TextEditingController _confirmPassword = TextEditingController(
-    text: "123456",
-  );
-  String? _selectGender = "male";
-
-  // final TextEditingController _email = TextEditingController();
-  // final TextEditingController _userName = TextEditingController();
-  // final TextEditingController _fullName = TextEditingController();
-  // final TextEditingController _phoneNumber = TextEditingController();
-  // final TextEditingController _password = TextEditingController();
-  // final TextEditingController _confirmPassword = TextEditingController();
+  // final TextEditingController _email = TextEditingController(
+  //   text: "hgiap89@gmail.com",
+  // );
+  // final TextEditingController _userName = TextEditingController(
+  //   text: "giapwibu1",
+  // );
+  // final TextEditingController _fullName = TextEditingController(
+  //   text: "Nguyen Van Hoang Giap",
+  // );
+  // final TextEditingController _phoneNumber = TextEditingController(
+  //   text: "0129876543",
+  // );
+  // final TextEditingController _password = TextEditingController(text: "123456");
+  // final TextEditingController _confirmPassword = TextEditingController(
+  //   text: "123456",
+  // );
   // String? _selectGender = "male";
+
+  final TextEditingController _email = TextEditingController();
+  final TextEditingController _userName = TextEditingController();
+  final TextEditingController _fullName = TextEditingController();
+  final TextEditingController _phoneNumber = TextEditingController();
+  final TextEditingController _password = TextEditingController();
+  final TextEditingController _confirmPassword = TextEditingController();
+  String? _selectGender = "male";
 
   @override
   Widget build(BuildContext context) {
@@ -202,7 +202,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
             (state is AuthError)
                 ? ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(state.error),
+                    content: Text(
+                      "Sign-up failed. Please check your information and try again.",
+                    ),
                     backgroundColor: Colors.red,
                   ),
                 )

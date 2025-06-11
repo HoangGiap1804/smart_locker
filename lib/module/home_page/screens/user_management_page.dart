@@ -14,6 +14,7 @@ class UserManagementPage extends StatefulWidget {
 class _UserManagementPageState extends State<UserManagementPage> {
   late Future<List<UserActive>> _futureUsers;
   final TextEditingController controllSearch = TextEditingController();
+  int? _isLoadingUserId;
 
   @override
   void initState() {
@@ -23,9 +24,13 @@ class _UserManagementPageState extends State<UserManagementPage> {
 
   void _loadUsers() {
     _futureUsers = UserRepository(ApiService()).getAllUsers();
+    _isLoadingUserId = null;
   }
 
   Future<void> _toggleUserStatus(UserActive user) async {
+    setState(() {
+      _isLoadingUserId = user.id; // Bắt đầu loading cho người dùng này
+    });
     bool success = await UserRepository(
       ApiService(),
     ).toggleUserActive(user.id, !user.isActive);
@@ -39,12 +44,25 @@ class _UserManagementPageState extends State<UserManagementPage> {
     return Column(
       children: [
         Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          child: Text(
+            "User Manager",
+            style: TextStyle(
+              fontSize: 24, // To
+              fontWeight: FontWeight.bold, // Đậm
+              color: Colors.black87, // Màu dễ nhìn
+              letterSpacing: 1.2, // Giãn chữ nhẹ
+            ),
+            textAlign: TextAlign.center, // Căn giữa nếu muốn
+          ),
+        ),
+        Padding(
           padding: EdgeInsets.all(12),
           child: SearchBar(
             controller: controllSearch,
             leading: Icon(Icons.search),
             backgroundColor: MaterialStatePropertyAll(Colors.white),
-            hintText: 'Search by username...',
+            hintText: 'Search by name or phone',
             onChanged: (value) {
               setState(() {});
             },
@@ -71,8 +89,12 @@ class _UserManagementPageState extends State<UserManagementPage> {
                       users
                           .where(
                             (user) =>
-                                user.email.contains(controllSearch.text) ||
-                                user.username.contains(controllSearch.text),
+                                user.fullName.toLowerCase().contains(
+                                  controllSearch.text.toLowerCase(),
+                                ) ||
+                                user.phone.toLowerCase().contains(
+                                  controllSearch.text.toLowerCase(),
+                                ),
                           )
                           .toList()
                   : listSearch = users;
@@ -98,22 +120,36 @@ class _UserManagementPageState extends State<UserManagementPage> {
                         child: const Icon(Icons.person, color: Colors.white),
                       ),
                       title: Text(
-                        user.username,
+                        user.fullName,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      subtitle: Text(user.email),
+                      subtitle: Text(user.phone),
                       trailing: InkWell(
                         onTap: () {
                           _toggleUserStatus(user);
                         },
-                        child: Chip(
-                          label: Text(user.isActive ? 'Active' : 'Inactive'),
-                          backgroundColor:
-                              user.isActive
-                                  ? Colors.greenAccent
-                                  : Colors.redAccent,
-                          labelStyle: const TextStyle(color: Colors.white),
-                        ),
+                        child:
+                            (_isLoadingUserId == user.id)
+                                ? const SizedBox(
+                                  width:
+                                      24, // Kích thước của CircularProgressIndicator
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                                : Chip(
+                                  label: Text(
+                                    user.isActive ? 'Active' : 'Inactive',
+                                  ),
+                                  backgroundColor:
+                                      user.isActive
+                                          ? Colors.greenAccent
+                                          : Colors.redAccent,
+                                  labelStyle: const TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
                       ),
                     ),
                   );

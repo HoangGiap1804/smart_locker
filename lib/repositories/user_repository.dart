@@ -44,12 +44,14 @@ class UserRepository {
       'phone_number': user.phoneNumber,
       'gender': user.gender,
       'password': user.password,
-      'face_images': await Future.wait(user.pictures!.map(
-      (file) async => await MultipartFile.fromFile(
-          file.path,
-          filename: "${ran.nextInt(10000000)}.jpg",
+      'face_images': await Future.wait(
+        user.pictures!.map(
+          (file) async => await MultipartFile.fromFile(
+            file.path,
+            filename: "${ran.nextInt(10000000)}.jpg",
+          ),
         ),
-      )),
+      ),
     });
 
     print("username: ${user.userName}");
@@ -75,7 +77,10 @@ class UserRepository {
     String? accessToken = await StorageService().getAccessToken();
     if (accessToken != null) {
       print("access token ${accessToken!}");
-      final response = await apiService.get('api/admin/users/', token: accessToken);
+      final response = await apiService.get(
+        'api/admin/users/',
+        token: accessToken,
+      );
 
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data['data'];
@@ -85,6 +90,36 @@ class UserRepository {
       }
     }
     return [];
+  }
+
+  Future<bool> forgotPassword() async {
+    final response = await apiService.get('api/auth/forgot-password/');
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      // throw Exception('Failed to fetch users');
+    }
+    return false;
+  }
+
+  Future<bool> changePassword(String oldPassword, String newPassword) async {
+    String? accessToken = await StorageService().getAccessToken();
+    if (accessToken != null) {
+      print("access token ${accessToken!}");
+      final response = await apiService.get(
+        'api/auth/change-password/',
+        data: {'old_password': oldPassword, 'new_password': newPassword},
+        token: accessToken,
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        // throw Exception('Failed to fetch users');
+      }
+    }
+    return false;
   }
 
   // Optional: Toggle user active status (nếu backend hỗ trợ)
