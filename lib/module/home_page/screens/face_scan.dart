@@ -159,7 +159,7 @@ class _FaceScanState extends State<FaceScan> {
                     });
                   } else {
                     NotificationMessage().notify(context, "Success");
-                    Future.delayed(Duration(milliseconds: 200), () {
+                    Future.delayed(Duration(milliseconds: 1000), () {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(builder: (context) => HomeScreen()),

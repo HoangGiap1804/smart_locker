@@ -36,21 +36,29 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         String username = event.username;
         String password = event.password;
 
-        User user = await UserRepository(
+        User? user = await UserRepository(
           ApiService(),
         ).signInUser(username, password);
-
-        StorageService().saveUser(user);
-
-        emit(LoginSucces(isAdmin: user.isAdmin!));
+        if (user != null) {
+          StorageService().saveUser(user);
+          emit(LoginSucces(isAdmin: user.isAdmin));
+        }
       } catch (e) {
-        print("error login ${e.toString()}");
-        emit(LoginError(error: e.toString()));
+        final errorMessage = e
+            .toString()
+            .replaceFirst('Exception: ', '')
+            .replaceFirst('Exception:', '');
+        print("error login $errorMessage");
+        emit(LoginError(error: errorMessage));
       }
     });
 
     on<SignUpSubmitted>((event, emit) async {
       emit(AuthLoading());
+      if (event.confirmPassword != event.password) {
+        emit(SignUpError(error: "Confirm password does not match."));
+        return;
+      }
       try {
         User signup = User(
           userName: event.userName,
@@ -67,7 +75,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           emit(SignUpSucces());
         }
       } catch (e) {
-        emit(SignUpError(error: e.toString()));
+        final errorMessage = e
+            .toString()
+            .replaceFirst('Exception: ', '')
+            .replaceFirst('Exception:', '');
+        print("error login $errorMessage");
+        emit(LoginError(error: errorMessage));
       }
     });
 

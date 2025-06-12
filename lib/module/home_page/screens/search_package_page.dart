@@ -67,7 +67,10 @@ class _SearchPackagePageState extends State<SearchPackagePage> {
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 16),
-          SearchField(controller: controller),
+          SearchField(
+            controller: controller,
+            onSubmitted: (_) => searchOrder(), // Gọi khi nhấn nút OK
+          ),
           const SizedBox(height: 12),
           if (resultMessage.isNotEmpty)
             Text(

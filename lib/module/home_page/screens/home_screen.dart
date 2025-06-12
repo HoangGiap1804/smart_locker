@@ -26,53 +26,61 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (context, state) {
           int currentIndex = (state is HomeChangePage) ? state.index : 0;
 
-          return Scaffold(
-            backgroundColor: Colors.white,
-            appBar: AppBar(
+          return GestureDetector(
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: Scaffold(
               backgroundColor: Colors.white,
-              elevation: 0,
-              title: const Text(
-                "Smart Locker",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              centerTitle: true,
-              actions: [
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const ProfileScreen()),
-                    );
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.only(right: 16),
-                    child: const CircleAvatar(
-                      radius: 18,
-                      backgroundImage: AssetImage("assets/images/avata.png"),
-                    ),
+              appBar: AppBar(
+                backgroundColor: Colors.white,
+                elevation: 0,
+                title: const Text(
+                  "Smart Locker",
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
                   ),
                 ),
-              ],
-            ),
-            body: IndexedStack(index: currentIndex, children: _pages),
-            bottomNavigationBar: BottomNavigationBar(
-              currentIndex: currentIndex,
-              selectedItemColor: Colors.redAccent,
-              unselectedItemColor: Colors.grey,
-              onTap: (index) {
-                context.read<HomeBloc>().add(ChangePage(index: index));
-              },
-              items: const [
-                BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.search),
-                  label: "Search",
-                ),
-              ],
+                centerTitle: true,
+                actions: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ProfileScreen(),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 16),
+                      child: const CircleAvatar(
+                        radius: 18,
+                        backgroundImage: AssetImage("assets/images/avata.png"),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              body: IndexedStack(index: currentIndex, children: _pages),
+              bottomNavigationBar: BottomNavigationBar(
+                currentIndex: currentIndex,
+                selectedItemColor: Colors.redAccent,
+                unselectedItemColor: Colors.grey,
+                onTap: (index) {
+                  context.read<HomeBloc>().add(ChangePage(index: index));
+                },
+                items: const [
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.home),
+                    label: "Home",
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.search),
+                    label: "Search",
+                  ),
+                ],
+              ),
             ),
           );
         },

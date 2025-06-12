@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 
 class SearchField extends StatelessWidget {
   final TextEditingController controller;
-  const SearchField({super.key, required this.controller});
+  final void Function(String)? onSubmitted;
+  const SearchField({super.key, required this.controller, this.onSubmitted});
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +22,7 @@ class SearchField extends StatelessWidget {
         padding: const EdgeInsets.all(5),
         child: TextField(
           controller: controller,
+          onSubmitted: onSubmitted,
           decoration: InputDecoration(
             filled: true,
             fillColor: Colors.white,

@@ -113,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
               if (state is AuthError) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text("Incorrect username or password."),
+                    content: Text(state.error),
                     backgroundColor: Colors.red,
                   ),
                 );

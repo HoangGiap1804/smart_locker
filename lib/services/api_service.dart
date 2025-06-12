@@ -47,7 +47,13 @@ class ApiService {
       );
       return response;
     } on DioException catch (e) {
-      throw Exception('POST request failed: ${e.message}');
+      if (e.response != null) {
+        // Trả về response từ server (kể cả khi là lỗi 401, 403,...)
+        return e.response!;
+      } else {
+        // Không có response (ví dụ lỗi mạng), ném ngoại lệ
+        throw Exception('POST request failed: ${e.message}');
+      }
     }
   }
 

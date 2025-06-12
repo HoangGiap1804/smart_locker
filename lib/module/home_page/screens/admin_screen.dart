@@ -21,70 +21,76 @@ class _AdminScreenState extends State<AdminScreen> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => HomeBloc(),
-      child: Scaffold(
-        backgroundColor: Color(0xfffdfdfd),
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          surfaceTintColor: Colors.white,
-          title: Text("Admin"),
-          centerTitle: true,
-          actions: [
-            GestureDetector(
-              onTap: () {
-                // context.router.push(ProfileRoute());
+      child: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Scaffold(
+          backgroundColor: Color(0xfffdfdfd),
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            surfaceTintColor: Colors.white,
+            title: Text("Admin"),
+            centerTitle: true,
+            actions: [
+              GestureDetector(
+                onTap: () {
+                  // context.router.push(ProfileRoute());
 
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ProfileAdmin()),
-                );
-              },
-              child: Container(
-                margin: EdgeInsets.all(10),
-                alignment: Alignment.center,
-                width: 40,
-                child: Image.asset("assets/images/avata.png"),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ProfileAdmin()),
+                  );
+                },
+                child: Container(
+                  margin: EdgeInsets.all(10),
+                  alignment: Alignment.center,
+                  width: 40,
+                  child: Image.asset("assets/images/avata.png"),
+                ),
               ),
-            ),
-          ],
-        ),
-        body: BlocBuilder<HomeBloc, HomeState>(
-          builder: (context, state) {
-            if (state is HomeChangePage) {
-              return IndexedStack(
-                index: state.index,
-                children: [
-                  UserManagementPage(),
-                  LockerManagementPage(),
-                  SearchOrderPage(),
-                  // VideoHistoryPage(),
+            ],
+          ),
+          body: BlocBuilder<HomeBloc, HomeState>(
+            builder: (context, state) {
+              if (state is HomeChangePage) {
+                return IndexedStack(
+                  index: state.index,
+                  children: [
+                    UserManagementPage(),
+                    LockerManagementPage(),
+                    SearchOrderPage(),
+                    // VideoHistoryPage(),
+                  ],
+                );
+              }
+              return UserManagementPage();
+            },
+          ),
+          bottomNavigationBar: BlocBuilder<HomeBloc, HomeState>(
+            builder: (context, state) {
+              int currentIndex = (state is HomeChangePage) ? state.index : 0;
+              return BottomNavigationBar(
+                selectedItemColor: Colors.redAccent,
+                currentIndex: currentIndex,
+                onTap: (index) {
+                  context.read<HomeBloc>().add(ChangePage(index: index));
+                },
+                items: const [
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.home),
+                    label: "Home",
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.window),
+                    label: "Lockers",
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.search),
+                    label: "Search",
+                  ),
                 ],
               );
-            }
-            return UserManagementPage();
-          },
-        ),
-        bottomNavigationBar: BlocBuilder<HomeBloc, HomeState>(
-          builder: (context, state) {
-            int currentIndex = (state is HomeChangePage) ? state.index : 0;
-            return BottomNavigationBar(
-              selectedItemColor: Colors.redAccent,
-              currentIndex: currentIndex,
-              onTap: (index) {
-                context.read<HomeBloc>().add(ChangePage(index: index));
-              },
-              items: const [
-                BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.window),
-                  label: "Lockers",
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.search),
-                  label: "Search",
-                ),
-              ],
-            );
-          },
+            },
+          ),
         ),
       ),
     );

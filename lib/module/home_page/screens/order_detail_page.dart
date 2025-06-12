@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_locker/models/order.dart';
+import 'package:smart_locker/module/home_page/screens/home_screen.dart';
+import 'package:smart_locker/module/home_page/widgets/notification_message.dart';
 import 'package:smart_locker/module/profile/profile/widgets/profile_button.dart';
 import 'package:smart_locker/repositories/order_repository.dart';
 import 'package:smart_locker/services/api_service.dart';
@@ -20,19 +22,43 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   bool set = false;
 
   void confirmOrder() async {
-    setState(() => isLoading = true);
+    NotificationMessage().showConfirmDialog(
+      context,
+      "Confirm Order",
+      "Please review your order details. If everything looks correct, tap OK to confirm.",
+      () {},
+      () async {
+        setState(() => isLoading = true);
 
-    String? accessToken = await StorageService().getAccessToken();
-    if (accessToken != null) {
-      set = await OrderRepository(
-        ApiService(),
-      ).confirmOrder(widget.order.orderId, accessToken);
-    }
-
-    setState(() {
-      isLoading = false;
-      text = set ? "SUCCESS" : "FAIL";
-    });
+        String? accessToken = await StorageService().getAccessToken();
+        if (accessToken != null) {
+          set = await OrderRepository(
+            ApiService(),
+          ).confirmOrder(widget.order.orderId, accessToken);
+        }
+        setState(() {
+          isLoading = false;
+          text = set ? "SUCCESS" : "FAIL";
+          if (set) {
+            NotificationMessage().notify(context, "Success");
+            Future.delayed(Duration(milliseconds: 2000), () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => HomeScreen()),
+              );
+            });
+          } else {
+            NotificationMessage().notify(context, "False");
+            Future.delayed(Duration(milliseconds: 2000), () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => HomeScreen()),
+              );
+            });
+          }
+        });
+      },
+    );
   }
 
   @override
@@ -115,7 +141,9 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
             const SizedBox(height: 20),
             isLoading
                 ? const CircularProgressIndicator()
-                : ProfileButton(onTab: confirmOrder, text: "CONFIRM"),
+                : (text.isEmpty)
+                ? ProfileButton(onTab: confirmOrder, text: "CONFIRM")
+                : SizedBox(),
           ],
         ),
       ),

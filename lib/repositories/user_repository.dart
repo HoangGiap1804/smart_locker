@@ -18,20 +18,28 @@ class UserRepository {
     return data.map((json) => User.fromJson(json)).toList();
   }
 
-  Future<User> signInUser(String username, String password) async {
-    final response = await apiService.post('api/auth/signin/', {
-      'username_email': username,
-      'password': password,
-    });
+  Future<User?> signInUser(String username, String password) async {
+    try {
+      final response = await apiService.post('api/auth/signin/', {
+        'username_email': username,
+        'password': password,
+      });
 
-    if (response.statusCode == 200) {
-      String refresh = response.data['refresh'];
-      String access = response.data['access'];
-      StorageService().saveTokens(access, refresh);
-      // throw Exception('Ghi nhan thanh cong');
-      return User.fromJson(response.data); // ✅ Trả về User
-    } else {
-      throw Exception('Username or password is wrong');
+      if (response.statusCode == 200) {
+        String refresh = response.data['refresh'];
+        String access = response.data['access'];
+        StorageService().saveTokens(access, refresh);
+        return User.fromJson(response.data); // ✅ Trả về User
+      } else if (response.statusCode == 403) {
+        throw Exception(response.data['error'] ?? 'Unauthorized or Forbidden');
+      } else if (response.statusCode == 401) {
+        throw Exception('Incorrect username or password.');
+      } else {
+        throw Exception(response.data['error'] ?? 'Login failed');
+      }
+    } catch (e) {
+      // Log hoặc xử lý lỗi kết nối mạng, parsing, v.v.
+      throw Exception(e.toString());
     }
   }
 

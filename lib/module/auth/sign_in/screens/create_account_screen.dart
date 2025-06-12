@@ -203,7 +203,8 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                 ? ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      "Sign-up failed. Please check your information and try again.",
+                      // "Sign-up failed. Please check your information and try again.",
+                      state.error,
                     ),
                     backgroundColor: Colors.red,
                   ),

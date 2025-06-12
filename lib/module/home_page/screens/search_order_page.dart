@@ -127,6 +127,8 @@ class _SearchOrderPageState extends State<SearchOrderPage> {
   Widget _buildSearchInput() {
     return TextField(
       controller: _controller,
+      textInputAction: TextInputAction.done, // Hiện nút "OK" hoặc "Done"
+      onSubmitted: (_) => _searchOrder(), // Gọi khi nhấn nút "Done"
       decoration: InputDecoration(
         labelText: "Enter Order ID",
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
