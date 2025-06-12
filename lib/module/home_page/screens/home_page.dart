@@ -176,8 +176,11 @@ class _HomePageState extends State<HomePage> {
                                     idOrder: order.orderId,
                                     status: order.status,
                                     timeDelevery: DateTime.parse(
-                                      order.createAt,
+                                      (showConfirmed)
+                                          ? order.createAt
+                                          : order.updatedAt,
                                     ),
+                                    isReceive: !showConfirmed,
                                   ),
                                   const SizedBox(height: 8),
                                   if (showConfirmed)

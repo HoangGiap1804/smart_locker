@@ -5,19 +5,20 @@ class Package extends StatelessWidget {
   final String idOrder;
   final String status;
   final DateTime timeDelevery;
-
+  final bool isReceive;
   const Package({
     super.key,
     required this.idOrder,
     required this.status,
     required this.timeDelevery,
+    required this.isReceive,
   });
 
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
-      case 'delivered':
+      case 'picked_up':
         return Colors.green;
-      case 'pending':
+      case 'confirmed':
         return Colors.orange;
       case 'failed':
         return Colors.red;
@@ -59,7 +60,7 @@ class Package extends StatelessWidget {
                   const SizedBox(height: 6),
                   Row(
                     children: [
-                      const Text("Delivery: "),
+                      Text((isReceive) ? "Receive: " : "Delivery: "),
                       Text(
                         DateFormat('yyyy/MM/dd - HH:mm').format(timeDelevery),
                         style: const TextStyle(color: Colors.black54),
@@ -71,7 +72,7 @@ class Package extends StatelessWidget {
                     children: [
                       const Text("Status: "),
                       Text(
-                        status,
+                        (status == "picked_up") ? "Picked up" : "Comfirmed",
                         style: TextStyle(
                           color: _getStatusColor(status),
                           fontWeight: FontWeight.bold,
