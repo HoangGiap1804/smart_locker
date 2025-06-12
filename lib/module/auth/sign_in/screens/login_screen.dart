@@ -25,11 +25,11 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailEditingController = TextEditingController(
-    text: "",
+    text: "giapwibu",
   );
 
   final TextEditingController passwordEditingController = TextEditingController(
-    text: "",
+    text: "12345678",
   );
 
   @override

@@ -1,5 +1,6 @@
 import 'package:smart_locker/models/shared/app_theme.dart';
 import 'package:smart_locker/models/user.dart';
+import 'package:smart_locker/module/auth/sign_in/screens/change_password_screen.dart';
 import 'package:smart_locker/module/auth/sign_in/screens/login_screen.dart';
 import 'package:smart_locker/module/profile/bloc/profile_bloc.dart';
 import 'package:smart_locker/module/profile/bloc/profile_event.dart';
@@ -108,7 +109,16 @@ class _ProfileAdminState extends State<ProfileAdmin> {
             // SizedBox(height: 25),
             // ProfileTextfieldPasswordInput(textEditingController: password),
             SizedBox(height: 15),
-            ChangePassword(onTap: () {}),
+            ChangePassword(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChangePasswordScreen(),
+                  ),
+                );
+              },
+            ),
             SizedBox(height: 15),
             ProfileButton(
               onTab: () {

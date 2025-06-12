@@ -100,8 +100,10 @@ class UserRepository {
     return [];
   }
 
-  Future<bool> forgotPassword() async {
-    final response = await apiService.get('api/auth/forgot-password/');
+  Future<bool> forgotPassword(email) async {
+    final response = await apiService.post1('api/auth/forgot-password/', {
+      'email': email,
+    });
 
     if (response.statusCode == 200) {
       return true;
@@ -115,11 +117,10 @@ class UserRepository {
     String? accessToken = await StorageService().getAccessToken();
     if (accessToken != null) {
       print("access token ${accessToken!}");
-      final response = await apiService.get(
-        'api/auth/change-password/',
-        data: {'old_password': oldPassword, 'new_password': newPassword},
-        token: accessToken,
-      );
+      final response = await apiService.post1('api/auth/change-password/', {
+        'old_password': oldPassword,
+        'new_password': newPassword,
+      }, accessToken);
 
       if (response.statusCode == 200) {
         return true;

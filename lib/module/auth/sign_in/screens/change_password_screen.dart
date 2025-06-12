@@ -8,6 +8,9 @@ import 'package:smart_locker/module/auth/bloc/auth_state.dart';
 import 'package:smart_locker/module/auth/sign_in/widgets/button.dart';
 import 'package:smart_locker/module/auth/sign_in/widgets/text_field_input.dart';
 import 'package:smart_locker/module/auth/sign_in/widgets/text_field_input_password.dart';
+import 'package:smart_locker/module/home_page/widgets/notification_message.dart';
+import 'package:smart_locker/repositories/user_repository.dart';
+import 'package:smart_locker/services/api_service.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -29,22 +32,25 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => authBloc,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 30),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: _header(),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: _form(),
-                ),
-              ],
+      child: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 30),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: _header(),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: _form(),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -95,9 +101,48 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   ? CircularProgressIndicator()
                   : Button(
                     text: "Change",
-                    onTab: () {
+                    onTab: () async {
+                      if (newConfirmedPassword.text != newPassword.text) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              "Confirm new password does not match.",
+                            ),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
                       setState(() {
                         isLoading = true;
+                      });
+
+                      bool set = await UserRepository(
+                        ApiService(),
+                      ).changePassword(oldPassword.text, newPassword.text);
+
+                      if (set) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Change password successful"),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                        Future.delayed(Duration(milliseconds: 2000), () {
+                          Navigator.pop(context);
+                        });
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Change password fail"),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+
+                      setState(() {
+                        isLoading = false;
                       });
                     },
                   ),

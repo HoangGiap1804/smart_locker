@@ -62,13 +62,23 @@ class ApiService {
     Map<String, dynamic> data, [
     String? token,
   ]) async {
-    return await _dio.post(
-      endpoint,
-      data: data,
-      options: Options(
-        headers: token != null ? {'Authorization': 'Bearer $token'} : {},
-      ),
-    );
+    try {
+      return await _dio.post(
+        endpoint,
+        data: data,
+        options: Options(
+          headers: token != null ? {'Authorization': 'Bearer $token'} : {},
+        ),
+      );
+    } on DioException catch (e) {
+      if (e.response != null) {
+        // Trả về response từ server (kể cả khi là lỗi 401, 403,...)
+        return e.response!;
+      } else {
+        // Không có response (ví dụ lỗi mạng), ném ngoại lệ
+        throw Exception('POST request failed: ${e.message}');
+      }
+    }
   }
 
   Future<Response> put(String endpoint, {String? token}) async {

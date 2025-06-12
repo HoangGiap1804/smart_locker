@@ -86,21 +86,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     on<ForgotPasswordSubmitted>((event, emit) async {
       emit(AuthLoading());
-      // try {
-      //   String username = event.username;
+      try {
+        String username = event.username;
 
-      //   String res = await AuthenticationRepository().forgotPassword(
-      //     username: username,
-      //   );
+        bool res = await UserRepository(ApiService()).forgotPassword(username);
 
-      //   if (res == "success") {
-      //     emit(SendEmailSuccess());
-      //   } else {
-      //     emit(SendEmailFaild(error: res));
-      //   }
-      // } catch (e) {
-      //   emit(SendEmailFaild(error: e.toString()));
-      // }
+        if (res) {
+          emit(SendEmailSuccess());
+        } else {
+          emit(
+            SendEmailFaild(
+              error: "The email address you entered is not registered.",
+            ),
+          );
+        }
+      } catch (e) {
+        emit(SendEmailFaild(error: e.toString()));
+      }
     });
   }
 }

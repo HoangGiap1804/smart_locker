@@ -24,54 +24,52 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context)=> authBloc,
-      child:  Scaffold(
-        backgroundColor: Colors.white,
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 30),
-          child: SingleChildScrollView(
-            child: Column(  
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: _header(),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: _form(),
-                ),
-              ],
-            )
+      create: (context) => authBloc,
+      child: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 30),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: _header(),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: _form(),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
-      )
-    );
-  }
-
-  Widget _header(){
-    return Align(  
-      alignment: Alignment.centerLeft,
-      child: Text(
-        "Forgot\npassword!",
-        style: AppTheme.textTheme.headlineLarge
       ),
     );
   }
 
-  Widget _form(){
-    return Column(  
+  Widget _header() {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Text("Forgot\npassword!", style: AppTheme.textTheme.headlineLarge),
+    );
+  }
+
+  Widget _form() {
+    return Column(
       children: [
         TextFieldInput(
-          textEditingController: emailEditingController, 
+          textEditingController: emailEditingController,
           hintText: "Enter your email address",
           icon: Icons.email,
-          onChanged: (value){
-            context.read<AuthBloc>().add(UsernameChanged(username: value));
-          },
+          onChanged: (value) {},
         ),
         Padding(
           padding: const EdgeInsets.only(top: 20),
-          child: Align(  
+          child: Align(
             alignment: Alignment.centerLeft,
             child: Text(
               "We will send you a message to set or reset your new password",
@@ -80,37 +78,42 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.only( top: 20),
+          padding: const EdgeInsets.only(top: 20),
           child: BlocConsumer<AuthBloc, AuthState>(
-          listener: (context, state){
-          (state is AuthError) ?
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.error),
-                backgroundColor: Colors.red,
-              ),
-            ) : null;
-          (state is SendEmailSuccess) ?
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text("We sent to your email"),
-                backgroundColor: Colors.green,
-              ),
-            ) : null;
-          },
-          builder: (context, state) {
-            return state is AuthLoading 
-              ? CircularProgressIndicator()
-              : Button(
-                text: "Send",
-                onTab: (){
-                  FocusScope.of(context).unfocus();
-                  context.read<AuthBloc>().add(ForgotPasswordSubmitted(
-                    username: emailEditingController.text.toString()));
-                },
-              );
-          }
-        ),
+            listener: (context, state) {
+              (state is AuthError)
+                  ? ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(state.error),
+                      backgroundColor: Colors.red,
+                    ),
+                  )
+                  : null;
+              (state is SendEmailSuccess)
+                  ? ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("We sent to your email"),
+                      backgroundColor: Colors.green,
+                    ),
+                  )
+                  : null;
+            },
+            builder: (context, state) {
+              return state is AuthLoading
+                  ? CircularProgressIndicator()
+                  : Button(
+                    text: "Send",
+                    onTab: () {
+                      FocusScope.of(context).unfocus();
+                      context.read<AuthBloc>().add(
+                        ForgotPasswordSubmitted(
+                          username: emailEditingController.text.toString(),
+                        ),
+                      );
+                    },
+                  );
+            },
+          ),
         ),
       ],
     );

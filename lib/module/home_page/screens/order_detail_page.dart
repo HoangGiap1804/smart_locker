@@ -48,7 +48,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               );
             });
           } else {
-            NotificationMessage().notify(context, "False");
+            NotificationMessage().notify(context, "Fail");
             Future.delayed(Duration(milliseconds: 2000), () {
               Navigator.pushReplacement(
                 context,
